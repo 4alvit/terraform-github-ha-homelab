@@ -1,0 +1,13 @@
+# Keep all remote configuration uploads limited to Terraform source.
+.git/
+.github/
+docs/
+*.md
+LICENSE
+.env
+.env.*
+*.tfvars
+*.tfvars.json
+*.tfplan
+*.tfstate
+*.tfstate.*
