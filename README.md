@@ -2,7 +2,8 @@
 
 [![Terraform CI](https://github.com/4alvit/terraform-github-ha-homelab/actions/workflows/ci.yml/badge.svg)](https://github.com/4alvit/terraform-github-ha-homelab/actions/workflows/ci.yml)
 
-Terraform manages the repositories of [HA Homelab](https://github.com/ha-homelab).
+Terraform manages the organization profile settings and repositories of
+[HA Homelab](https://github.com/ha-homelab).
 This public project contains repository settings only. Home Assistant configuration,
 automations, scripts, household data, and credentials belong in private repositories.
 
@@ -16,8 +17,8 @@ automations, scripts, household data, and credentials belong in private reposito
 Repository contents and deployment workflows are maintained in those repositories.
 This project does not deploy or reload Home Assistant. Its own repository settings
 belong to [terraform-github-4alvit](https://github.com/4alvit/terraform-github-4alvit).
-The GitHub organization already exists; organization creation and avatar selection
-are not supported by this Terraform configuration.
+The existing organization settings are imported, preserving billing and access
+defaults. Organization creation and avatar selection are outside this configuration.
 
 ## HCP Terraform
 
@@ -28,7 +29,9 @@ The HCP organization follows the existing personal-account infrastructure conven
 the target GitHub organization is `ha-homelab`.
 
 Set `github_token` as a **sensitive Terraform-category workspace variable** with HCL
-disabled. Use a credential authorized to administer these repositories. Keep its
+disabled. Also set `billing_email` as a sensitive Terraform-category variable using
+the existing organization billing email; importing settings must not change it.
+Use a credential authorized to administer these repositories. Keep its
 permissions limited to the target organization and operations in this configuration.
 Do not commit credentials or Terraform state.
 
