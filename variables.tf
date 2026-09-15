@@ -3,3 +3,9 @@ variable "github_token" {
   type        = string
   sensitive   = true
 }
+
+variable "billing_email" {
+  description = "Existing organization billing email; preserve its value and store it only as a sensitive HCP Terraform variable."
+  type        = string
+  sensitive   = true
+}
