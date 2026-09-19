@@ -15,6 +15,11 @@ locals {
       visibility  = "private"
       topics      = ["home-assistant", "home-automation", "k3s", "kubernetes"]
     }
+    home-floorplan-3d = {
+      description = "Private residential floor plan, reproducible 3D models, and Home Assistant device placement"
+      visibility  = "private"
+      topics      = ["home-assistant", "floorplan", "gltf", "usdz", "3d"]
+    }
     ".github" = {
       description = "HA Homelab organization profile and original visual identity"
       visibility  = "public"
