@@ -12,6 +12,8 @@ automations, scripts, household data, and credentials belong in private reposito
 - `ha-homelab/automations` — private Home Assistant automations.
 - `ha-homelab/scripts` — private reusable Home Assistant scripts.
 - `ha-homelab/home-assistant` — private configuration and deployment guidance.
+- `ha-homelab/home-floorplan-3d` — private architectural source plans, reproducible
+  3D exports, an offline placement viewer, and Home Assistant device mappings.
 - `ha-homelab/.github` — public organization profile and original logo assets.
 
 Repository contents and deployment workflows are maintained in those repositories.
