@@ -59,42 +59,21 @@ Dependabot security updates and vulnerability alerts are enabled where supported
 
 ### Default branch protection
 
-[`branch-protection.tf`](branch-protection.tf) reads the organization's current plan
-from GitHub. GitHub Free does not support enforced branch protection or rulesets for
-private repositories. On the verified **2026-09-25** plan (`free`), GitHub returns
-HTTP 403 for both private ruleset and branch-protection APIs. A warning that `main`
-is unprotected is therefore accurate; adding a Terraform resource cannot override
-the entitlement. See [GitHub's ruleset availability](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
+The owner decided on **2026-09-25** to keep GitHub Free and leave the four private
+repositories without enforced branch protection. Access is limited to the trusted
+household owners and their automation. Pull requests and successful CI remain the
+working convention; they are not server-enforced merge requirements.
 
-On Free, the `branch_protection` output lists all four private repositories under
-`pending_private_repositories`. The public profile keeps its existing active
-ruleset and administrator bypass; its resource address and remote ID are unchanged.
+The `main`-is-unprotected warning is expected and accepted. Do not enable paid
+Team solely for branch protection, make household configuration public, or treat
+this warning as a pending repair. A future plan change must not automatically add
+private rulesets or change auto-merge settings; either requires a new explicit
+policy decision.
 
-After the organization is upgraded to GitHub Team or Enterprise, the next reviewed
-Terraform plan creates one active ruleset for each private default branch and
-enables auto-merge. A paid subscription is a separate billing decision; Terraform
-does not purchase or change it. The rules require:
-
-- Pull requests using squash merge, with all review threads resolved. No second
-  person's approval is required for this single-owner workflow.
-- Successful checks on an up-to-date branch, bound to the GitHub Actions app:
-  `validate` and `maintenance-runtime` for `home-assistant`;
-  `Validate automation contracts` for `automations`;
-  `Validate YAML and behavior contracts` for `scripts`;
-  `validate` and `home-assistant` for `home-floorplan-3d`.
-- No branch deletion, force pushes or routine administrator bypass. Normal
-  administrator merges must also wait for CI.
-
-The private rulesets use `prevent_destroy`, so a plan downgrade or inventory edit
-cannot silently remove protection. An unavailable or unrecognized plan fails the
-plan instead of claiming the repositories are protected. Renaming a required CI
-job requires a matching change here.
-
-To activate after a separately authorized plan upgrade, run the normal remote
-`terraform plan` and `terraform apply` from a clean reviewed commit. Expect four
-new private rulesets and auto-merge enabled for those four repositories. Then
-verify `protected: true` on each default branch and finish with a no-change plan.
-Do not make household configuration public to work around the plan restriction.
+GitHub Free does not support enforced private-repository rulesets; see
+[GitHub's availability documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
+The public `.github` profile retains its existing active protection and
+administrator bypass. Its Terraform resource address and remote ID are unchanged.
 
 ### Existing repository ownership
 
@@ -117,11 +96,8 @@ their corresponding addresses as well. Never commit state or credentials.
 terraform fmt -check -recursive
 terraform init -backend=false -input=false -lockfile=readonly
 terraform validate
-terraform test
 ```
 
-The tests use a mocked GitHub provider to check Free, Team, Enterprise and missing
-plan behavior without credentials, network access or changes to remote state.
 The provider lock file is committed for reproducibility. Repository visibility is
 also verified against GitHub after remote apply. Every infrastructure change should
 end with a fresh remote plan showing no unintended changes.
