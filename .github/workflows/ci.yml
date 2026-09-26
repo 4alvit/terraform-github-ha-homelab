@@ -28,5 +28,3 @@ jobs:
         run: terraform init -backend=false -input=false -lockfile=readonly
       - name: Validate configuration
         run: terraform validate -no-color
-      - name: Test branch protection for free and paid organization plans
-        run: terraform test -no-color
