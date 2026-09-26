@@ -57,11 +57,59 @@ Private visibility is explicit, repository destruction is blocked, and default
 branches are `main`. Squash merges keep history readable and remove merged branches.
 Dependabot security updates and vulnerability alerts are enabled where supported.
 
-GitHub Free does not enforce branch protection for private repositories. Those repos
-use reviewable pull requests and CI as a workflow convention; this is not a claim of
-server-enforced protection. The public profile repo protects `main` from deletion and
-force pushes, with an administrator bypass for bootstrap and recovery. No paid
-security features or subscriptions are enabled by this configuration.
+### Default branch protection
+
+[`branch-protection.tf`](branch-protection.tf) reads the organization's current plan
+from GitHub. GitHub Free does not support enforced branch protection or rulesets for
+private repositories. On the verified **2026-09-25** plan (`free`), GitHub returns
+HTTP 403 for both private ruleset and branch-protection APIs. A warning that `main`
+is unprotected is therefore accurate; adding a Terraform resource cannot override
+the entitlement. See [GitHub's ruleset availability](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
+
+On Free, the `branch_protection` output lists all four private repositories under
+`pending_private_repositories`. The public profile keeps its existing active
+ruleset and administrator bypass; its resource address and remote ID are unchanged.
+
+After the organization is upgraded to GitHub Team or Enterprise, the next reviewed
+Terraform plan creates one active ruleset for each private default branch and
+enables auto-merge. A paid subscription is a separate billing decision; Terraform
+does not purchase or change it. The rules require:
+
+- Pull requests using squash merge, with all review threads resolved. No second
+  person's approval is required for this single-owner workflow.
+- Successful checks on an up-to-date branch, bound to the GitHub Actions app:
+  `validate` and `maintenance-runtime` for `home-assistant`;
+  `Validate automation contracts` for `automations`;
+  `Validate YAML and behavior contracts` for `scripts`;
+  `validate` and `home-assistant` for `home-floorplan-3d`.
+- No branch deletion, force pushes or routine administrator bypass. Normal
+  administrator merges must also wait for CI.
+
+The private rulesets use `prevent_destroy`, so a plan downgrade or inventory edit
+cannot silently remove protection. An unavailable or unrecognized plan fails the
+plan instead of claiming the repositories are protected. Renaming a required CI
+job requires a matching change here.
+
+To activate after a separately authorized plan upgrade, run the normal remote
+`terraform plan` and `terraform apply` from a clean reviewed commit. Expect four
+new private rulesets and auto-merge enabled for those four repositories. Then
+verify `protected: true` on each default branch and finish with a no-change plan.
+Do not make household configuration public to work around the plan restriction.
+
+### Existing repository ownership
+
+On **2026-09-25**, GitHub's five-repository inventory matched both
+`local.repositories` and the canonical HCP state: `home-assistant`, `automations`,
+`scripts`, `home-floorplan-3d` and `.github`. Repository settings, default branches,
+vulnerability alerts and Dependabot security updates were already in state; the
+public profile ruleset was also present. No repository import was needed.
+The baseline remote plan reported no infrastructure changes.
+
+When adopting another existing repository, add its configuration and an import
+block for the existing `github_repository.repositories["name"]` resource before
+applying; review the plan to avoid recreating or changing its visibility. Inventory
+and import any existing default-branch, security-settings or ruleset resources at
+their corresponding addresses as well. Never commit state or credentials.
 
 ## Validation
 
@@ -69,8 +117,11 @@ security features or subscriptions are enabled by this configuration.
 terraform fmt -check -recursive
 terraform init -backend=false -input=false -lockfile=readonly
 terraform validate
+terraform test
 ```
 
+The tests use a mocked GitHub provider to check Free, Team, Enterprise and missing
+plan behavior without credentials, network access or changes to remote state.
 The provider lock file is committed for reproducibility. Repository visibility is
 also verified against GitHub after remote apply. Every infrastructure change should
 end with a fresh remote plan showing no unintended changes.
