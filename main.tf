@@ -46,7 +46,7 @@ resource "github_repository" "repositories" {
   allow_merge_commit     = false
   allow_squash_merge     = true
   allow_rebase_merge     = false
-  allow_auto_merge       = false
+  allow_auto_merge       = each.value.visibility == "private" && local.private_rulesets_supported
   delete_branch_on_merge = true
 
   squash_merge_commit_title   = "PR_TITLE"
@@ -77,8 +77,8 @@ resource "github_repository_dependabot_security_updates" "repositories" {
   depends_on = [github_repository_vulnerability_alerts.repositories]
 }
 
-# GitHub Free supports branch rulesets for public repositories only. Do not
-# create unenforceable protections or enable paid features for private configs.
+# Preserve the public profile's existing ruleset and state address. Private
+# repository rulesets are gated by the actual GitHub plan in branch-protection.tf.
 resource "github_repository_ruleset" "profile" {
   name        = "Protect main"
   repository  = github_repository.repositories[".github"].name
