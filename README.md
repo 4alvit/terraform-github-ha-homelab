@@ -9,6 +9,9 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Ownership
 
+- `ha-homelab/ha-desloc` — public, unofficial DESLOC C100 Plus integration for
+  Home Assistant, including HACS packaging, source, tests, and documentation.
+  Captures, account sessions, and household device data are excluded.
 - `ha-homelab/automations` — private Home Assistant automations.
 - `ha-homelab/scripts` — private reusable Home Assistant scripts.
 - `ha-homelab/home-assistant` — private configuration and deployment guidance.
@@ -53,7 +56,7 @@ provider validation without credentials; merging a PR does not itself apply chan
 
 ## Repository policy
 
-Private visibility is explicit, repository destruction is blocked, and default
+Visibility is explicit, repository destruction is blocked, and default
 branches are `main`. Squash merges keep history readable and remove merged branches.
 Dependabot security updates and vulnerability alerts are enabled where supported.
 
@@ -74,6 +77,8 @@ GitHub Free does not support enforced private-repository rulesets; see
 [GitHub's availability documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
 The public `.github` profile retains its existing active protection and
 administrator bypass. Its Terraform resource address and remote ID are unchanged.
+The public `ha-desloc` integration has a separate ruleset with pull requests,
+resolved review threads, protected history, and the same administrator bypass.
 
 ### Existing repository ownership
 

@@ -1,5 +1,11 @@
 locals {
   repositories = {
+    ha-desloc = {
+      description = "Unofficial DESLOC C100 Plus cloud integration for Home Assistant: lock control, state, battery and Wi-Fi signal"
+      visibility  = "public"
+      has_issues  = true
+      topics      = ["desloc", "hacs", "home-assistant", "home-assistant-custom-component", "smart-lock", "python"]
+    }
     automations = {
       description = "Home Assistant automations: documented behavior, stable identities, and validated YAML"
       visibility  = "private"
@@ -38,7 +44,7 @@ resource "github_repository" "repositories" {
   topics      = each.value.topics
 
   auto_init       = true
-  has_issues      = each.value.visibility == "private"
+  has_issues      = try(each.value.has_issues, each.value.visibility == "private")
   has_projects    = false
   has_wiki        = false
   has_discussions = false
@@ -82,6 +88,37 @@ resource "github_repository_dependabot_security_updates" "repositories" {
 resource "github_repository_ruleset" "profile" {
   name        = "Protect main"
   repository  = github_repository.repositories[".github"].name
+  target      = "branch"
+  enforcement = "active"
+
+  bypass_actors {
+    actor_id    = 5
+    actor_type  = "RepositoryRole"
+    bypass_mode = "always"
+  }
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 0
+      required_review_thread_resolution = true
+    }
+  }
+}
+
+# Public integration source follows the same PR and history protection pattern.
+resource "github_repository_ruleset" "desloc" {
+  name        = "Protect main"
+  repository  = github_repository.repositories["ha-desloc"].name
   target      = "branch"
   enforcement = "active"
 
