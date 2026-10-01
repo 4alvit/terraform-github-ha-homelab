@@ -9,6 +9,9 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Ownership
 
+- `ha-homelab/ha-desloc-card` — public Lovelace dashboard card for the DESLOC
+  integration, distributed separately through HACS.
+
 - `ha-homelab/ha-desloc` — public, unofficial DESLOC C100 Plus integration for
   Home Assistant, including HACS packaging, source, tests, and documentation.
   Captures, account sessions, and household device data are excluded.

@@ -6,6 +6,12 @@ locals {
       has_issues  = true
       topics      = ["desloc", "hacs", "home-assistant", "home-assistant-custom-component", "smart-lock", "python"]
     }
+    ha-desloc-card = {
+      description = "Home Assistant Lovelace card for DESLOC locks: state, battery, Wi-Fi signal and confirmed unlock controls"
+      visibility  = "public"
+      has_issues  = true
+      topics      = ["desloc", "hacs", "home-assistant", "lovelace-custom-card", "smart-lock", "javascript"]
+    }
     automations = {
       description = "Home Assistant automations: documented behavior, stable identities, and validated YAML"
       visibility  = "private"
@@ -119,6 +125,37 @@ resource "github_repository_ruleset" "profile" {
 resource "github_repository_ruleset" "desloc" {
   name        = "Protect main"
   repository  = github_repository.repositories["ha-desloc"].name
+  target      = "branch"
+  enforcement = "active"
+
+  bypass_actors {
+    actor_id    = 5
+    actor_type  = "RepositoryRole"
+    bypass_mode = "always"
+  }
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 0
+      required_review_thread_resolution = true
+    }
+  }
+}
+
+# The dashboard card is independently installable through HACS.
+resource "github_repository_ruleset" "desloc_card" {
+  name        = "Protect main"
+  repository  = github_repository.repositories["ha-desloc-card"].name
   target      = "branch"
   enforcement = "active"
 
