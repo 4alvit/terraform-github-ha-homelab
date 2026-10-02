@@ -9,6 +9,9 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Ownership
 
+- `ha-homelab/ha-echo-show-5` — public Echo Show 5 Gen2 Android conversion,
+  backup verification and Home Assistant Companion guides and tools.
+  Firmware, backups, credentials and household data are excluded.
 - `ha-homelab/ha-echo-dot` — public Echo Dot 2 conversion and Home Assistant
   integration guides, reproducible wake-word training and exact-runtime checks.
   Firmware, audio, trained weights, credentials and household data are excluded.
@@ -85,7 +88,7 @@ The public `.github` profile retains its existing active protection and
 administrator bypass. Its Terraform resource address and remote ID are unchanged.
 The public `ha-desloc` integration has a separate ruleset with pull requests,
 resolved review threads, protected history, and the same administrator bypass.
-The public `ha-desloc-card` and `ha-echo-dot` repositories follow that same
+The public `ha-desloc-card`, `ha-echo-dot` and `ha-echo-show-5` repositories follow that same
 protection pattern. No private-repository access policy changes are implied.
 
 ### Existing repository ownership

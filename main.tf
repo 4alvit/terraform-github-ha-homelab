@@ -1,5 +1,11 @@
 locals {
   repositories = {
+    ha-echo-show-5 = {
+      description = "Reuse Echo Show 5 Gen2 with Android and Home Assistant: amonet and TWRP conversion, verified backups, LineageOS installation and Companion setup"
+      visibility  = "public"
+      has_issues  = true
+      topics      = ["amazon-echo", "android", "echo-show-5", "home-assistant", "lineageos", "twrp"]
+    }
     ha-echo-dot = {
       description = "Reuse Echo Dot 2 with EchoLocal and Home Assistant: conversion guide, Russian wake-word training, exact-runtime evaluation and HA setup"
       visibility  = "public"
@@ -193,6 +199,37 @@ resource "github_repository_ruleset" "desloc_card" {
 resource "github_repository_ruleset" "echo_dot" {
   name        = "Protect main"
   repository  = github_repository.repositories["ha-echo-dot"].name
+  target      = "branch"
+  enforcement = "active"
+
+  bypass_actors {
+    actor_id    = 5
+    actor_type  = "RepositoryRole"
+    bypass_mode = "always"
+  }
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 0
+      required_review_thread_resolution = true
+    }
+  }
+}
+
+# Public Show 5 conversion guides and tools use the same history protection.
+resource "github_repository_ruleset" "echo_show_5" {
+  name        = "Protect main"
+  repository  = github_repository.repositories["ha-echo-show-5"].name
   target      = "branch"
   enforcement = "active"
 
