@@ -1,5 +1,11 @@
 locals {
   repositories = {
+    ha-echo-dot = {
+      description = "Reuse Echo Dot 2 with EchoLocal and Home Assistant: conversion guide, Russian wake-word training, exact-runtime evaluation and HA setup"
+      visibility  = "public"
+      has_issues  = true
+      topics      = ["amazon-echo", "echo-dot", "echolocal", "home-assistant", "microwakeword", "voice-assistant"]
+    }
     ha-desloc = {
       description = "Unofficial DESLOC C100 Plus cloud integration for Home Assistant: lock control, state, battery and Wi-Fi signal"
       visibility  = "public"
@@ -156,6 +162,37 @@ resource "github_repository_ruleset" "desloc" {
 resource "github_repository_ruleset" "desloc_card" {
   name        = "Protect main"
   repository  = github_repository.repositories["ha-desloc-card"].name
+  target      = "branch"
+  enforcement = "active"
+
+  bypass_actors {
+    actor_id    = 5
+    actor_type  = "RepositoryRole"
+    bypass_mode = "always"
+  }
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 0
+      required_review_thread_resolution = true
+    }
+  }
+}
+
+# Public EchoLocal guides and training tools use the same history protection.
+resource "github_repository_ruleset" "echo_dot" {
+  name        = "Protect main"
+  repository  = github_repository.repositories["ha-echo-dot"].name
   target      = "branch"
   enforcement = "active"
 
