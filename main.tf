@@ -1,5 +1,11 @@
 locals {
   repositories = {
+    slzb-06-recovery = {
+      description = "SMLIGHT SLZB-06 backup, core and Zigbee coordinator upgrades, tested legacy Ethernet recovery tools, and troubleshooting"
+      visibility  = "public"
+      has_issues  = true
+      topics      = ["smlight", "slzb-06", "zigbee", "home-assistant", "firmware", "recovery"]
+    }
     ha-echo-show-5 = {
       description = "Reuse Echo Show 5 Gen2 with Android and Home Assistant: amonet and TWRP conversion, verified backups, LineageOS installation and Companion setup"
       visibility  = "public"
@@ -230,6 +236,37 @@ resource "github_repository_ruleset" "echo_dot" {
 resource "github_repository_ruleset" "echo_show_5" {
   name        = "Protect main"
   repository  = github_repository.repositories["ha-echo-show-5"].name
+  target      = "branch"
+  enforcement = "active"
+
+  bypass_actors {
+    actor_id    = 5
+    actor_type  = "RepositoryRole"
+    bypass_mode = "always"
+  }
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 0
+      required_review_thread_resolution = true
+    }
+  }
+}
+
+# Public recovery documentation and tools follow the same PR/history protection.
+resource "github_repository_ruleset" "slzb_06_recovery" {
+  name        = "Protect main"
+  repository  = github_repository.repositories["slzb-06-recovery"].name
   target      = "branch"
   enforcement = "active"
 
