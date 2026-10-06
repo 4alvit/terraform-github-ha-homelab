@@ -7,7 +7,7 @@ Terraform manages the organization profile settings and repositories of
 This public project contains repository settings only. Home Assistant configuration,
 automations, scripts, household data, and credentials belong in private repositories.
 
-## Ownership
+## Public project ownership
 
 - `ha-homelab/slzb-06-recovery` — public SMLIGHT SLZB-06 backup, core/radio
   upgrade, and legacy Ethernet recovery documentation and scripts. Firmware,
@@ -25,11 +25,6 @@ automations, scripts, household data, and credentials belong in private reposito
 - `ha-homelab/ha-desloc` — public, unofficial DESLOC C100 Plus integration for
   Home Assistant, including HACS packaging, source, tests, and documentation.
   Captures, account sessions, and household device data are excluded.
-- `ha-homelab/automations` — private Home Assistant automations.
-- `ha-homelab/scripts` — private reusable Home Assistant scripts.
-- `ha-homelab/home-assistant` — private configuration and deployment guidance.
-- `ha-homelab/home-floorplan-3d` — private architectural source plans, reproducible
-  3D exports, an offline placement viewer, and Home Assistant device mappings.
 - `ha-homelab/.github` — public organization profile and original logo assets.
 
 Repository contents and deployment workflows are maintained in those repositories.
@@ -75,7 +70,7 @@ Dependabot security updates and vulnerability alerts are enabled where supported
 
 ### Default branch protection
 
-The owner decided on **2026-09-25** to keep GitHub Free and leave the four private
+The owner decided on **2026-09-25** to keep GitHub Free and leave private
 repositories without enforced branch protection. Access is limited to the trusted
 household owners and their automation. Pull requests and successful CI remain the
 working convention; they are not server-enforced merge requirements.
@@ -97,12 +92,10 @@ protection pattern. No private-repository access policy changes are implied.
 
 ### Existing repository ownership
 
-On **2026-09-25**, GitHub's five-repository inventory matched both
-`local.repositories` and the canonical HCP state: `home-assistant`, `automations`,
-`scripts`, `home-floorplan-3d` and `.github`. Repository settings, default branches,
-vulnerability alerts and Dependabot security updates were already in state; the
-public profile ruleset was also present. No repository import was needed.
-The baseline remote plan reported no infrastructure changes.
+The original repository inventory and canonical HCP state were reconciled
+before adoption. Preserve the operator's inventory and import evidence outside
+public documentation. A clean plan covers only resources already represented
+in configuration and state; compare it with the authorized live inventory too.
 
 When adopting another existing repository, add its configuration and an import
 block for the existing `github_repository.repositories["name"]` resource before
