@@ -1,5 +1,11 @@
 locals {
   repositories = {
+    rf-airbridge = {
+      description = "ESPHome CC1101 RF gateway: MQTT code discovery, Home Assistant automation and transmission, with preserved motion sensors"
+      visibility  = "public"
+      has_issues  = true
+      topics      = ["esphome", "cc1101", "mqtt", "home-assistant", "433mhz", "rf"]
+    }
     slzb-06-recovery = {
       description = "SMLIGHT SLZB-06 backup, core and Zigbee coordinator upgrades, tested legacy Ethernet recovery tools, and troubleshooting"
       visibility  = "public"
@@ -267,6 +273,37 @@ resource "github_repository_ruleset" "echo_show_5" {
 resource "github_repository_ruleset" "slzb_06_recovery" {
   name        = "Protect main"
   repository  = github_repository.repositories["slzb-06-recovery"].name
+  target      = "branch"
+  enforcement = "active"
+
+  bypass_actors {
+    actor_id    = 5
+    actor_type  = "RepositoryRole"
+    bypass_mode = "always"
+  }
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 0
+      required_review_thread_resolution = true
+    }
+  }
+}
+
+# Public RF gateway source uses the same PR and history protection pattern.
+resource "github_repository_ruleset" "rf_airbridge" {
+  name        = "Protect main"
+  repository  = github_repository.repositories["rf-airbridge"].name
   target      = "branch"
   enforcement = "active"
 
