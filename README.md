@@ -9,6 +9,10 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Public project ownership
 
+- `ha-homelab/rf-airbridge` — public ESPHome CC1101 RF gateway, MQTT code
+  discovery, Home Assistant automation and transmission, with preserved motion
+  sensors. Credentials and household-specific data are excluded.
+
 - `ha-homelab/slzb-06-recovery` — public SMLIGHT SLZB-06 backup, core/radio
   upgrade, and legacy Ethernet recovery documentation and scripts. Firmware,
   network backups, keys, credentials, and household identifiers are excluded.
@@ -87,7 +91,7 @@ The public `.github` profile retains its existing active protection and
 administrator bypass. Its Terraform resource address and remote ID are unchanged.
 The public `ha-desloc` integration has a separate ruleset with pull requests,
 resolved review threads, protected history, and the same administrator bypass.
-The public `slzb-06-recovery`, `ha-desloc-card`, `ha-echo-dot` and `ha-echo-show-5` repositories follow that same
+The public `rf-airbridge`, `slzb-06-recovery`, `ha-desloc-card`, `ha-echo-dot` and `ha-echo-show-5` repositories follow that same
 protection pattern. No private-repository access policy changes are implied.
 
 ### Existing repository ownership
