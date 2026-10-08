@@ -5,13 +5,11 @@ temporary=$(mktemp -d "${TMPDIR:-/tmp}/public-security-test.XXXXXX")
 trap 'rm -rf "$temporary"' EXIT
 mkdir -p "$temporary/tests" "$temporary/provider-cache"
 touch "$temporary/empty.tfrc"
-cp public-security.tf tests/public-security-main.tf.fixture "$temporary/"
-mv "$temporary/public-security-main.tf.fixture" "$temporary/main.tf"
+cp main.tf public-security.tf tests/public-security-main.tf.fixture "$temporary/"
+mv "$temporary/public-security-main.tf.fixture" "$temporary/test-providers.tf"
 cp tests/public-security.tftest.hcl "$temporary/tests/"
 if [[ -f .terraform.lock.hcl ]]; then
-  if [[ -f .terraform.lock.hcl ]]; then
   cp .terraform.lock.hcl "$temporary/"
-fi
 fi
 test_terraform() {
   env -i PATH="$PATH" HOME="$temporary" TF_IN_AUTOMATION=1 TF_INPUT=0 \

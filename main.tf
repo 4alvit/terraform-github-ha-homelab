@@ -164,6 +164,15 @@ resource "github_repository_ruleset" "desloc" {
   target      = "branch"
   enforcement = "active"
 
+  dynamic "bypass_actors" {
+    for_each = contains(local.active_public_software_repositories, "ha-desloc") ? [] : [true]
+    content {
+      actor_id    = 5
+      actor_type  = "RepositoryRole"
+      bypass_mode = "always"
+    }
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -175,10 +184,10 @@ resource "github_repository_ruleset" "desloc" {
     deletion         = true
     non_fast_forward = true
     pull_request {
-      dismiss_stale_reviews_on_push     = true
-      require_last_push_approval        = true
+      dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "ha-desloc")
+      require_last_push_approval        = contains(local.active_public_software_repositories, "ha-desloc")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 2
+      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-desloc") ? 2 : 0
       required_review_thread_resolution = true
     }
   }
@@ -191,6 +200,15 @@ resource "github_repository_ruleset" "desloc_card" {
   target      = "branch"
   enforcement = "active"
 
+  dynamic "bypass_actors" {
+    for_each = contains(local.active_public_software_repositories, "ha-desloc-card") ? [] : [true]
+    content {
+      actor_id    = 5
+      actor_type  = "RepositoryRole"
+      bypass_mode = "always"
+    }
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -202,10 +220,10 @@ resource "github_repository_ruleset" "desloc_card" {
     deletion         = true
     non_fast_forward = true
     pull_request {
-      dismiss_stale_reviews_on_push     = true
-      require_last_push_approval        = true
+      dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "ha-desloc-card")
+      require_last_push_approval        = contains(local.active_public_software_repositories, "ha-desloc-card")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 2
+      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-desloc-card") ? 2 : 0
       required_review_thread_resolution = true
     }
   }
@@ -218,6 +236,15 @@ resource "github_repository_ruleset" "echo_dot" {
   target      = "branch"
   enforcement = "active"
 
+  dynamic "bypass_actors" {
+    for_each = contains(local.active_public_software_repositories, "ha-echo-dot") ? [] : [true]
+    content {
+      actor_id    = 5
+      actor_type  = "RepositoryRole"
+      bypass_mode = "always"
+    }
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -229,10 +256,10 @@ resource "github_repository_ruleset" "echo_dot" {
     deletion         = true
     non_fast_forward = true
     pull_request {
-      dismiss_stale_reviews_on_push     = true
-      require_last_push_approval        = true
+      dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "ha-echo-dot")
+      require_last_push_approval        = contains(local.active_public_software_repositories, "ha-echo-dot")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 2
+      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-echo-dot") ? 2 : 0
       required_review_thread_resolution = true
     }
   }
@@ -245,6 +272,15 @@ resource "github_repository_ruleset" "echo_show_5" {
   target      = "branch"
   enforcement = "active"
 
+  dynamic "bypass_actors" {
+    for_each = contains(local.active_public_software_repositories, "ha-echo-show-5") ? [] : [true]
+    content {
+      actor_id    = 5
+      actor_type  = "RepositoryRole"
+      bypass_mode = "always"
+    }
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -256,10 +292,10 @@ resource "github_repository_ruleset" "echo_show_5" {
     deletion         = true
     non_fast_forward = true
     pull_request {
-      dismiss_stale_reviews_on_push     = true
-      require_last_push_approval        = true
+      dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "ha-echo-show-5")
+      require_last_push_approval        = contains(local.active_public_software_repositories, "ha-echo-show-5")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 2
+      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-echo-show-5") ? 2 : 0
       required_review_thread_resolution = true
     }
   }
@@ -272,6 +308,15 @@ resource "github_repository_ruleset" "slzb_06_recovery" {
   target      = "branch"
   enforcement = "active"
 
+  dynamic "bypass_actors" {
+    for_each = contains(local.active_public_software_repositories, "slzb-06-recovery") ? [] : [true]
+    content {
+      actor_id    = 5
+      actor_type  = "RepositoryRole"
+      bypass_mode = "always"
+    }
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -283,10 +328,10 @@ resource "github_repository_ruleset" "slzb_06_recovery" {
     deletion         = true
     non_fast_forward = true
     pull_request {
-      dismiss_stale_reviews_on_push     = true
-      require_last_push_approval        = true
+      dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "slzb-06-recovery")
+      require_last_push_approval        = contains(local.active_public_software_repositories, "slzb-06-recovery")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 2
+      required_approving_review_count   = contains(local.active_public_software_repositories, "slzb-06-recovery") ? 2 : 0
       required_review_thread_resolution = true
     }
   }
@@ -299,6 +344,15 @@ resource "github_repository_ruleset" "rf_airbridge" {
   target      = "branch"
   enforcement = "active"
 
+  dynamic "bypass_actors" {
+    for_each = contains(local.active_public_software_repositories, "rf-airbridge") ? [] : [true]
+    content {
+      actor_id    = 5
+      actor_type  = "RepositoryRole"
+      bypass_mode = "always"
+    }
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -310,10 +364,10 @@ resource "github_repository_ruleset" "rf_airbridge" {
     deletion         = true
     non_fast_forward = true
     pull_request {
-      dismiss_stale_reviews_on_push     = true
-      require_last_push_approval        = true
+      dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "rf-airbridge")
+      require_last_push_approval        = contains(local.active_public_software_repositories, "rf-airbridge")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 2
+      required_approving_review_count   = contains(local.active_public_software_repositories, "rf-airbridge") ? 2 : 0
       required_review_thread_resolution = true
     }
   }

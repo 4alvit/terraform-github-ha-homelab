@@ -7,8 +7,3 @@ terraform {
     }
   }
 }
-
-variable "github_organization" {
-  type    = string
-  default = "release-contract-fixture"
-}
