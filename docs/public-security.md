@@ -14,6 +14,16 @@ separately through GitHub's repository API; the pinned Terraform provider does
 not expose that setting. Verify it under repository security settings during
 onboarding. Do not put a credential in a commit to test push protection.
 
+New public repositories may set `enable_secret_scanning = true` in the declared
+inventory, so protection is enabled during creation without querying a repository
+that does not exist yet. The visibility guard still excludes private repositories.
+`zigbee-direct-button` uses this path and has its own ruleset with the same two
+current approvals and no bypass. During initial provisioning, create only its
+repository, default branch, and security-update resources with a reviewed targeted
+plan; publish the initial source, then apply its ruleset and run a complete plan.
+The final configuration must include the ruleset. This bootstrap sequence does
+not relax rules on any existing repository.
+
 ## Rollout and state ownership
 
 Merge the application repair PRs after their required checks succeed, then

@@ -1,5 +1,12 @@
 locals {
   repositories = {
+    zigbee-direct-button = {
+      description            = "Direct Zigbee group control for Tuya buttons: short-press toggle, hold-to-off, reproducible firmware and Home Assistant guides"
+      visibility             = "public"
+      has_issues             = true
+      enable_secret_scanning = true
+      topics                 = ["zigbee", "tuya", "home-assistant", "zha", "firmware", "tlsr8258"]
+    }
     rf-airbridge = {
       description = "ESPHome CC1101 RF gateway: MQTT code discovery, Home Assistant automation and transmission, with preserved motion sensors"
       visibility  = "public"
@@ -67,7 +74,7 @@ locals {
 # Terraform owns repository settings. Each repository owns its own files and CI.
 resource "github_repository" "repositories" {
   dynamic "security_and_analysis" {
-    for_each = each.value.visibility == "public" && contains(local.active_public_software_repositories, each.key) ? [true] : []
+    for_each = each.value.visibility == "public" && (try(each.value.enable_secret_scanning, false) || contains(local.active_public_software_repositories, each.key)) ? [true] : []
     content {
       secret_scanning {
         status = "enabled"
@@ -104,6 +111,35 @@ resource "github_repository" "repositories" {
 
   lifecycle {
     prevent_destroy = true
+  }
+}
+
+# A newly provisioned repository cannot yet be queried by the public-software
+# data source. Its declared public visibility enables the same secret protections
+# immediately; the initial source is published before this ruleset is activated.
+resource "github_repository_ruleset" "zigbee_direct_button" {
+  name        = "Protect main"
+  repository  = github_repository.repositories["zigbee-direct-button"].name
+  target      = "branch"
+  enforcement = "active"
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 2
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
+      required_review_thread_resolution = true
+    }
   }
 }
 
