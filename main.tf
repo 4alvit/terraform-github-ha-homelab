@@ -66,6 +66,18 @@ locals {
 
 # Terraform owns repository settings. Each repository owns its own files and CI.
 resource "github_repository" "repositories" {
+  dynamic "security_and_analysis" {
+    for_each = each.value.visibility == "public" && contains(local.active_public_software_repositories, each.key) ? [true] : []
+    content {
+      secret_scanning {
+        status = "enabled"
+      }
+      secret_scanning_push_protection {
+        status = "enabled"
+      }
+    }
+  }
+
   for_each = local.repositories
 
   name        = each.key
@@ -152,12 +164,6 @@ resource "github_repository_ruleset" "desloc" {
   target      = "branch"
   enforcement = "active"
 
-  bypass_actors {
-    actor_id    = 5
-    actor_type  = "RepositoryRole"
-    bypass_mode = "always"
-  }
-
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -169,8 +175,10 @@ resource "github_repository_ruleset" "desloc" {
     deletion         = true
     non_fast_forward = true
     pull_request {
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 0
+      required_approving_review_count   = 2
       required_review_thread_resolution = true
     }
   }
@@ -183,12 +191,6 @@ resource "github_repository_ruleset" "desloc_card" {
   target      = "branch"
   enforcement = "active"
 
-  bypass_actors {
-    actor_id    = 5
-    actor_type  = "RepositoryRole"
-    bypass_mode = "always"
-  }
-
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -200,8 +202,10 @@ resource "github_repository_ruleset" "desloc_card" {
     deletion         = true
     non_fast_forward = true
     pull_request {
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 0
+      required_approving_review_count   = 2
       required_review_thread_resolution = true
     }
   }
@@ -214,12 +218,6 @@ resource "github_repository_ruleset" "echo_dot" {
   target      = "branch"
   enforcement = "active"
 
-  bypass_actors {
-    actor_id    = 5
-    actor_type  = "RepositoryRole"
-    bypass_mode = "always"
-  }
-
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -231,8 +229,10 @@ resource "github_repository_ruleset" "echo_dot" {
     deletion         = true
     non_fast_forward = true
     pull_request {
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 0
+      required_approving_review_count   = 2
       required_review_thread_resolution = true
     }
   }
@@ -245,12 +245,6 @@ resource "github_repository_ruleset" "echo_show_5" {
   target      = "branch"
   enforcement = "active"
 
-  bypass_actors {
-    actor_id    = 5
-    actor_type  = "RepositoryRole"
-    bypass_mode = "always"
-  }
-
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -262,8 +256,10 @@ resource "github_repository_ruleset" "echo_show_5" {
     deletion         = true
     non_fast_forward = true
     pull_request {
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 0
+      required_approving_review_count   = 2
       required_review_thread_resolution = true
     }
   }
@@ -276,12 +272,6 @@ resource "github_repository_ruleset" "slzb_06_recovery" {
   target      = "branch"
   enforcement = "active"
 
-  bypass_actors {
-    actor_id    = 5
-    actor_type  = "RepositoryRole"
-    bypass_mode = "always"
-  }
-
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -293,8 +283,10 @@ resource "github_repository_ruleset" "slzb_06_recovery" {
     deletion         = true
     non_fast_forward = true
     pull_request {
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 0
+      required_approving_review_count   = 2
       required_review_thread_resolution = true
     }
   }
@@ -307,12 +299,6 @@ resource "github_repository_ruleset" "rf_airbridge" {
   target      = "branch"
   enforcement = "active"
 
-  bypass_actors {
-    actor_id    = 5
-    actor_type  = "RepositoryRole"
-    bypass_mode = "always"
-  }
-
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -324,8 +310,10 @@ resource "github_repository_ruleset" "rf_airbridge" {
     deletion         = true
     non_fast_forward = true
     pull_request {
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 0
+      required_approving_review_count   = 2
       required_review_thread_resolution = true
     }
   }
