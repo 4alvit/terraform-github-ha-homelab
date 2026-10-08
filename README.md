@@ -89,10 +89,10 @@ GitHub Free does not support enforced private-repository rulesets; see
 [GitHub's availability documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
 The public `.github` profile retains its existing active protection and
 administrator bypass. Its Terraform resource address and remote ID are unchanged.
-The public `ha-desloc` integration has a separate ruleset with pull requests,
-resolved review threads, protected history, and the same administrator bypass.
-The public `rf-airbridge`, `slzb-06-recovery`, `ha-desloc-card`, `ha-echo-dot` and `ha-echo-show-5` repositories follow that same
-protection pattern. No private-repository access policy changes are implied.
+The six public code repositories require two current approving reviews and
+resolved review threads, and protect history without administrator or automation
+bypasses. See [public security policy](docs/public-security.md) for activation.
+No private-repository access policy changes are implied.
 
 ### Existing repository ownership
 
@@ -122,3 +122,11 @@ end with a fresh remote plan showing no unintended changes.
 ## License
 
 [MIT](LICENSE). This is an independent homelab project, not an official Home Assistant project.
+
+## Contributions and public security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for bug reports, proposed changes and tests,
+[SECURITY.md](SECURITY.md) for private vulnerability reports, and
+[public security policy](docs/public-security.md) for review requirements,
+secret protection and rollout/state ownership. OpenSSF readiness is assessed
+for this infrastructure repository separately from the projects it manages.
