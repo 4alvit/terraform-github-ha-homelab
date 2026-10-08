@@ -9,6 +9,11 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Public project ownership
 
+- `ha-homelab/zigbee-direct-button` — public Tuya button firmware for direct
+  Zigbee group control: short-press toggle and hold-to-off, reproducible builds,
+  Home Assistant setup, backup, upgrades, and troubleshooting. Credentials,
+  household identifiers, and real network backups are excluded.
+
 - `ha-homelab/rf-airbridge` — public ESPHome CC1101 RF gateway, MQTT code
   discovery, Home Assistant automation and transmission, with preserved motion
   sensors. Credentials and household-specific data are excluded.

@@ -87,3 +87,20 @@ run "profile_and_private_repository_settings_are_unchanged" {
     error_message = "The profile and private repository must remain outside the public software rollout."
   }
 }
+
+run "new_public_button_repository_has_protections_without_live_lookup" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.repositories["zigbee-direct-button"].visibility == "public" &&
+      one(one(github_repository.repositories["zigbee-direct-button"].security_and_analysis).secret_scanning).status == "enabled" &&
+      one(one(github_repository.repositories["zigbee-direct-button"].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
+      length(github_repository_ruleset.zigbee_direct_button.bypass_actors) == 0 &&
+      one(one(github_repository_ruleset.zigbee_direct_button.rules).pull_request).required_approving_review_count == 2 &&
+      one(one(github_repository_ruleset.zigbee_direct_button.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.zigbee_direct_button.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.zigbee_direct_button.rules).pull_request).required_review_thread_resolution
+    )
+    error_message = "The new public button repository must bootstrap with secret protection and the same review policy."
+  }
+}
