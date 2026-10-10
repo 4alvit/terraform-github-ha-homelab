@@ -22,6 +22,10 @@ automations, scripts, household data, and credentials belong in private reposito
   upgrade, and legacy Ethernet recovery documentation and scripts. Firmware,
   network backups, keys, credentials, and household identifiers are excluded.
 
+- `ha-homelab/ha-tuya-esphome` — public legacy Tuya ESP8266-to-ESPHome
+  conversion tooling, Linux workbench setup, troubleshooting and Home Assistant
+  Matter bridge guides for Google Home and Alexa. Credentials, firmware builds,
+  session logs and household identifiers stay outside the public repository.
 - `ha-homelab/ha-echo-show-5` — public Echo Show 5 Gen2 Android conversion,
   backup verification and Home Assistant Companion guides and tools.
   Firmware, backups, credentials and household data are excluded.

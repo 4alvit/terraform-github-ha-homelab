@@ -19,6 +19,13 @@ locals {
       has_issues  = true
       topics      = ["smlight", "slzb-06", "zigbee", "home-assistant", "firmware", "recovery"]
     }
+    ha-tuya-esphome = {
+      description            = "Convert legacy Tuya ESP8266 plugs to ESPHome: a reproducible Linux flashing station, troubleshooting, and Home Assistant Matter bridge integration for Google Home and Alexa"
+      visibility             = "public"
+      has_issues             = true
+      enable_secret_scanning = true
+      topics                 = ["alexa", "esp8266", "esphome", "google-home", "home-assistant", "matter", "tuya-convert"]
+    }
     ha-echo-show-5 = {
       description = "Reuse Echo Show 5 Gen2 with Android and Home Assistant: amonet and TWRP conversion, verified backups, LineageOS installation and Companion setup"
       visibility  = "public"
@@ -67,6 +74,33 @@ locals {
       description = "HA Homelab organization profile and original visual identity"
       visibility  = "public"
       topics      = ["home-assistant", "homelab", "github-profile"]
+    }
+  }
+}
+
+# Public conversion tooling follows the existing public-repository policy.
+resource "github_repository_ruleset" "tuya_esphome" {
+  name        = "Protect main"
+  repository  = github_repository.repositories["ha-tuya-esphome"].name
+  target      = "branch"
+  enforcement = "active"
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 2
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
+      required_review_thread_resolution = true
     }
   }
 }

@@ -104,3 +104,20 @@ run "new_public_button_repository_has_protections_without_live_lookup" {
     error_message = "The new public button repository must bootstrap with secret protection and the same review policy."
   }
 }
+
+run "new_public_conversion_repository_has_protections_without_live_lookup" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.repositories["ha-tuya-esphome"].visibility == "public" &&
+      one(one(github_repository.repositories["ha-tuya-esphome"].security_and_analysis).secret_scanning).status == "enabled" &&
+      one(one(github_repository.repositories["ha-tuya-esphome"].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
+      length(github_repository_ruleset.tuya_esphome.bypass_actors) == 0 &&
+      one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).required_approving_review_count == 2 &&
+      one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).required_review_thread_resolution
+    )
+    error_message = "The new conversion repository must require secret protection and two current reviews without bypass."
+  }
+}
