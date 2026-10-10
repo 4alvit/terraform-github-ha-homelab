@@ -112,6 +112,8 @@ run "new_public_conversion_repository_has_protections_without_live_lookup" {
       github_repository.repositories["ha-tuya-esphome"].visibility == "public" &&
       one(one(github_repository.repositories["ha-tuya-esphome"].security_and_analysis).secret_scanning).status == "enabled" &&
       one(one(github_repository.repositories["ha-tuya-esphome"].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
+      toset(one(one(github_repository_ruleset.tuya_esphome.conditions).ref_name).include) == toset(["~DEFAULT_BRANCH"]) &&
+      length(one(one(github_repository_ruleset.tuya_esphome.conditions).ref_name).exclude) == 0 &&
       length(github_repository_ruleset.tuya_esphome.bypass_actors) == 0 &&
       one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).required_approving_review_count == 2 &&
       one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).dismiss_stale_reviews_on_push &&
