@@ -123,3 +123,51 @@ run "new_public_conversion_repository_has_protections_without_live_lookup" {
     error_message = "The new conversion repository must require secret protection and two current reviews without bypass."
   }
 }
+
+run "home_assistant_predecessor_keeps_private_identity" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.repositories["home-assistant"].name == "home-assistant-private" &&
+      github_repository.repositories["home-assistant"].visibility == "private" &&
+      length(github_repository.repositories["home-assistant"].security_and_analysis) == 0 &&
+      github_repository.repositories["automations"].visibility == "private" &&
+      github_repository.repositories["scripts"].visibility == "private"
+    )
+    error_message = "The old repository and component histories must remain private at their existing resource addresses."
+  }
+}
+
+run "public_home_assistant_has_fresh_history_and_least_privilege_ci" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.home_assistant_public.name == "home-assistant" &&
+      github_repository.home_assistant_public.visibility == "public" &&
+      !github_repository.home_assistant_public.auto_init &&
+      one(one(github_repository.home_assistant_public.security_and_analysis).secret_scanning).status == "enabled" &&
+      one(one(github_repository.home_assistant_public.security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
+      github_workflow_repository_permissions.home_assistant_public.default_workflow_permissions == "read" &&
+      !github_workflow_repository_permissions.home_assistant_public.can_approve_pull_request_reviews
+    )
+    error_message = "The new repository must start empty, protect secrets, and grant public CI only read access."
+  }
+}
+
+run "public_home_assistant_protects_reviewed_main" {
+  command = plan
+  assert {
+    condition = (
+      github_branch_default.home_assistant_public.branch == "main" &&
+      github_repository_ruleset.home_assistant_public.enforcement == "active" &&
+      length(github_repository_ruleset.home_assistant_public.bypass_actors) == 0 &&
+      one(github_repository_ruleset.home_assistant_public.rules).deletion &&
+      one(github_repository_ruleset.home_assistant_public.rules).non_fast_forward &&
+      one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).required_approving_review_count == 2 &&
+      one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).require_last_push_approval &&
+      toset([for check in one(one(github_repository_ruleset.home_assistant_public.rules).required_status_checks).required_check : check.context]) == toset(["validate", "maintenance-runtime"])
+    )
+    error_message = "Public Home Assistant main must require current reviews and both CI checks, without a bypass."
+  }
+}
