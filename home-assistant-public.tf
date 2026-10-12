@@ -36,7 +36,6 @@ resource "github_repository" "home_assistant_public" {
     prevent_destroy = true
   }
 
-  depends_on = [github_repository.repositories["home-assistant"]]
 }
 
 resource "github_workflow_repository_permissions" "home_assistant_public" {
@@ -53,4 +52,49 @@ resource "github_repository_dependabot_security_updates" "home_assistant_public"
   repository = github_repository.home_assistant_public.id
   enabled    = true
   depends_on = [github_repository_vulnerability_alerts.home_assistant_public]
+}
+
+# Apply these after the reviewed root commit has populated the empty repository.
+resource "github_branch_default" "home_assistant_public" {
+  repository = github_repository.home_assistant_public.name
+  branch     = "main"
+}
+
+resource "github_repository_ruleset" "home_assistant_public" {
+  name        = "Protect main"
+  repository  = github_repository.home_assistant_public.name
+  target      = "branch"
+  enforcement = "active"
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 2
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
+      required_review_thread_resolution = true
+    }
+    required_status_checks {
+      strict_required_status_checks_policy = true
+      required_check {
+        context        = "validate"
+        integration_id = 15368
+      }
+      required_check {
+        context        = "maintenance-runtime"
+        integration_id = 15368
+      }
+    }
+  }
+
+  depends_on = [github_branch_default.home_assistant_public]
 }

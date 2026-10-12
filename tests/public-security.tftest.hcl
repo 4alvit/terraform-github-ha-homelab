@@ -153,3 +153,21 @@ run "public_home_assistant_has_fresh_history_and_least_privilege_ci" {
     error_message = "The new repository must start empty, protect secrets, and grant public CI only read access."
   }
 }
+
+run "public_home_assistant_protects_reviewed_main" {
+  command = plan
+  assert {
+    condition = (
+      github_branch_default.home_assistant_public.branch == "main" &&
+      github_repository_ruleset.home_assistant_public.enforcement == "active" &&
+      length(github_repository_ruleset.home_assistant_public.bypass_actors) == 0 &&
+      one(github_repository_ruleset.home_assistant_public.rules).deletion &&
+      one(github_repository_ruleset.home_assistant_public.rules).non_fast_forward &&
+      one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).required_approving_review_count == 2 &&
+      one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).require_last_push_approval &&
+      toset([for check in one(one(github_repository_ruleset.home_assistant_public.rules).required_status_checks).required_check : check.context]) == toset(["validate", "maintenance-runtime"])
+    )
+    error_message = "Public Home Assistant main must require current reviews and both CI checks, without a bypass."
+  }
+}
