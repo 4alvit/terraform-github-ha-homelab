@@ -21,7 +21,8 @@ Never push an old checkout's branches or tags into the new public repository.
 ## Publish a new file snapshot
 
 Create the new public repository only after the rename has completed. Keep the
-old and new repositories at separate Terraform addresses. Use an empty new
+old and new repositories at separate Terraform addresses. The new repository
+uses `github_repository.home_assistant_public`. Use an empty new
 repository and push only the fresh `main` root commit from a reviewed directory
 that never contained the predecessor's Git database. Do not use GitHub import,
 forking, mirror pushes, old tags, or a recursive copy of a live HA configuration.
@@ -44,3 +45,13 @@ not deploy or restart Home Assistant. If publication must stop, retain the old
 private repository; do not expose its history to populate the new repository.
 Apply any infrastructure reversal through Terraform after checking both remote
 repository IDs and the current source of dependent tooling.
+
+## Scope of the migration apply
+
+The initial full plan identified pre-existing differences in other public
+repositories' rulesets. Do not apply those removals as part of this migration.
+Use explicit targets for the predecessor's repository, default branch,
+vulnerability alerts and Dependabot settings, then the separately named public
+resources. Review each actual plan and confirm the predecessor keeps the same
+GitHub repository ID. A final scoped no-change plan verifies this migration;
+any remaining full-workspace drift needs separate review.

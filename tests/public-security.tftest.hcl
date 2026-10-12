@@ -137,3 +137,19 @@ run "home_assistant_predecessor_keeps_private_identity" {
     error_message = "The old repository and component histories must remain private at their existing resource addresses."
   }
 }
+
+run "public_home_assistant_has_fresh_history_and_least_privilege_ci" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.home_assistant_public.name == "home-assistant" &&
+      github_repository.home_assistant_public.visibility == "public" &&
+      !github_repository.home_assistant_public.auto_init &&
+      one(one(github_repository.home_assistant_public.security_and_analysis).secret_scanning).status == "enabled" &&
+      one(one(github_repository.home_assistant_public.security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
+      github_workflow_repository_permissions.home_assistant_public.default_workflow_permissions == "read" &&
+      !github_workflow_repository_permissions.home_assistant_public.can_approve_pull_request_reviews
+    )
+    error_message = "The new repository must start empty, protect secrets, and grant public CI only read access."
+  }
+}

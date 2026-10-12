@@ -46,6 +46,15 @@ belong to [terraform-github-4alvit](https://github.com/4alvit/terraform-github-4
 The existing organization settings are imported, preserving billing and access
 defaults. Organization creation and avatar selection are outside this configuration.
 
+## Home Assistant source repositories
+
+`home-assistant-private` retains the predecessor's private Git history at the
+existing `github_repository.repositories["home-assistant"]` Terraform address.
+The separately provisioned public `home-assistant` repository is owned by
+`github_repository.home_assistant_public` and starts from a sanitized file
+snapshot with bundled automation and script libraries. The old component
+repositories stay private. See [publication procedure](docs/home-assistant-publication.md).
+
 ## HCP Terraform
 
 The canonical remote workspace is
