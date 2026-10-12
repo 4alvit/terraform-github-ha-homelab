@@ -177,7 +177,7 @@ run "public_home_assistant_has_fresh_history_and_least_privilege_ci" {
       github_workflow_repository_permissions.home_assistant_public.default_workflow_permissions == "read" &&
       github_workflow_repository_permissions.home_assistant_public.can_approve_pull_request_reviews
     )
-    error_message = "The new repository must start empty, protect secrets, and grant public CI only read access."
+    error_message = "The new repository must start empty, protect secrets, retain read-only token defaults, and allow explicitly scoped PR approval jobs."
   }
 }
 

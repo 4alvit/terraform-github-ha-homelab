@@ -39,8 +39,9 @@ resource "github_repository" "home_assistant_public" {
 }
 
 resource "github_workflow_repository_permissions" "home_assistant_public" {
-  repository                       = github_repository.home_assistant_public.name
-  default_workflow_permissions     = "read"
+  repository                   = github_repository.home_assistant_public.name
+  default_workflow_permissions = "read"
+  # Only explicitly opted-in PRs receive approval in the repository CI workflow.
   can_approve_pull_request_reviews = true
 }
 
