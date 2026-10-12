@@ -10,6 +10,9 @@ mock_provider "github" {
 
 run "existing_public_rules_require_one_current_review" {
   command = plan
+  variables {
+    public_security_enforcement_repositories = ["ha-desloc", "ha-desloc-card", "ha-echo-dot", "ha-echo-show-5", "slzb-06-recovery", "rf-airbridge"]
+  }
   assert {
     condition = length(local.active_public_software_repositories) == 6 && alltrue([
       for policy in [
@@ -32,6 +35,9 @@ run "existing_public_rules_require_one_current_review" {
 }
 
 run "private_repository_preserves_existing_policy" {
+  variables {
+    public_security_enforcement_repositories = ["ha-desloc"]
+  }
   command         = plan
   expect_failures = [github_repository_collaborator.desloc_coderabbit["ha-desloc"]]
   override_data {
@@ -55,6 +61,9 @@ run "private_repository_preserves_existing_policy" {
 }
 
 run "archived_repository_preserves_existing_policy" {
+  variables {
+    public_security_enforcement_repositories = ["ha-desloc"]
+  }
   command         = plan
   expect_failures = [github_repository_collaborator.desloc_coderabbit["ha-desloc"]]
   override_data {
@@ -166,7 +175,7 @@ run "public_home_assistant_has_fresh_history_and_least_privilege_ci" {
       one(one(github_repository.home_assistant_public.security_and_analysis).secret_scanning).status == "enabled" &&
       one(one(github_repository.home_assistant_public.security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
       github_workflow_repository_permissions.home_assistant_public.default_workflow_permissions == "read" &&
-      !github_workflow_repository_permissions.home_assistant_public.can_approve_pull_request_reviews
+      github_workflow_repository_permissions.home_assistant_public.can_approve_pull_request_reviews
     )
     error_message = "The new repository must start empty, protect secrets, and grant public CI only read access."
   }
@@ -187,5 +196,42 @@ run "public_home_assistant_protects_reviewed_main" {
       toset([for check in one(one(github_repository_ruleset.home_assistant_public.rules).required_status_checks).required_check : check.context]) == toset(["validate", "maintenance-runtime"])
     )
     error_message = "Public Home Assistant main must require current reviews and both CI checks, without a bypass."
+  }
+}
+
+run "unactivated_public_reviews_preserve_existing_bypasses" {
+  command = plan
+  assert {
+    condition = alltrue([
+      for policy in [
+        github_repository_ruleset.desloc,
+        github_repository_ruleset.desloc_card,
+        github_repository_ruleset.echo_dot,
+        github_repository_ruleset.echo_show_5,
+        github_repository_ruleset.slzb_06_recovery,
+        github_repository_ruleset.rf_airbridge
+        ] : (
+        length(policy.bypass_actors) == 1 &&
+        one(one(policy.rules).pull_request).required_approving_review_count == 0 &&
+        !one(one(policy.rules).pull_request).require_last_push_approval &&
+        !one(one(policy.rules).pull_request).dismiss_stale_reviews_on_push
+      )
+    ])
+    error_message = "Existing reviews and bypasses must remain until explicitly activated."
+  }
+}
+
+run "existing_ci_and_auto_merge_settings_are_preserved" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.repositories["zigbee-direct-button"].allow_auto_merge &&
+      github_repository.repositories["ha-tuya-esphome"].allow_auto_merge &&
+      !github_repository.repositories[".github"].allow_auto_merge &&
+      toset([for check in one(one(github_repository_ruleset.zigbee_direct_button.rules).required_status_checks).required_check : check.context]) == toset(["CI gate", "test"]) &&
+      toset([for check in one(one(github_repository_ruleset.tuya_esphome.rules).required_status_checks).required_check : check.context]) == toset(["check"]) &&
+      toset([for check in one(one(github_repository_ruleset.echo_show_5.rules).required_status_checks).required_check : check.context]) == toset(["CI gate"])
+    )
+    error_message = "The existing automatic merge and mandatory CI settings must not regress."
   }
 }

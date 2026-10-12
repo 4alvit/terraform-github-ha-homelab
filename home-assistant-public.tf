@@ -41,7 +41,7 @@ resource "github_repository" "home_assistant_public" {
 resource "github_workflow_repository_permissions" "home_assistant_public" {
   repository                       = github_repository.home_assistant_public.name
   default_workflow_permissions     = "read"
-  can_approve_pull_request_reviews = false
+  can_approve_pull_request_reviews = true
 }
 
 resource "github_repository_vulnerability_alerts" "home_assistant_public" {

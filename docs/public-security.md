@@ -2,11 +2,14 @@
 
 `public-security.tf` lists the public repositories reviewed for this rollout.
 Live metadata excludes private and archived repositories from new protections.
-Existing public review rules require one approving review, dismiss stale
-approvals and require resolution of review threads. Administrator and automation
-bypass actors are removed for this scope. Missing review rules are added without
-replacing existing status checks or immutable-tag rules. Existing release CI
-gates require success for administrators as well as other contributors.
+The six audited public repositories preserve their current administrator bypass
+and review settings by default. Set `public_security_enforcement_repositories` only
+for repositories whose approval automation has been verified; activation requires
+one current approval, dismisses stale approvals, resolves review threads, and
+removes administrator bypasses. Live visibility and archive checks still apply.
+This explicit activation does not affect the already active one-review policies
+for the button, Tuya conversion, and public Home Assistant repositories.
+Existing mandatory status checks and enabled auto-merge settings are preserved.
 
 Secret scanning and push protection are enabled on the audited public repository
 resources managed by this state. Private vulnerability reporting was enabled
