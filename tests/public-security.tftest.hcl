@@ -123,3 +123,17 @@ run "new_public_conversion_repository_has_protections_without_live_lookup" {
     error_message = "The new conversion repository must require secret protection and two current reviews without bypass."
   }
 }
+
+run "home_assistant_predecessor_keeps_private_identity" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.repositories["home-assistant"].name == "home-assistant-private" &&
+      github_repository.repositories["home-assistant"].visibility == "private" &&
+      length(github_repository.repositories["home-assistant"].security_and_analysis) == 0 &&
+      github_repository.repositories["automations"].visibility == "private" &&
+      github_repository.repositories["scripts"].visibility == "private"
+    )
+    error_message = "The old repository and component histories must remain private at their existing resource addresses."
+  }
+}

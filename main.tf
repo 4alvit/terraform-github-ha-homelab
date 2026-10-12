@@ -61,6 +61,7 @@ locals {
       topics      = ["home-assistant", "home-automation", "yaml"]
     }
     home-assistant = {
+      name        = "home-assistant-private"
       description = "Home Assistant configuration, deployment guidance, and integration contracts"
       visibility  = "private"
       topics      = ["home-assistant", "home-automation", "k3s", "kubernetes"]
@@ -121,7 +122,7 @@ resource "github_repository" "repositories" {
 
   for_each = local.repositories
 
-  name        = each.key
+  name        = try(each.value.name, each.key)
   description = each.value.description
   visibility  = each.value.visibility
   topics      = each.value.topics
