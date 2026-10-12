@@ -76,3 +76,16 @@ No OpenSSF award is claimed by this document. Maintainer knowledge, external
 report-response history, release-note applicability, full static-analysis scope
 and all remaining mandatory criteria need individual verification. A repository
 is not certified because its managed applications are certified or vice versa.
+
+## Public Home Assistant CI approval
+
+`github_workflow_repository_permissions.home_assistant_public` allows GitHub
+Actions to create approving PR reviews while preserving `read` as the default
+workflow permission. The public HA configuration workflow grants
+`pull-requests: write` only to its metadata-only approval job, after both required
+CI jobs pass, for same-repository owner PRs carrying the explicit `auto-approve`
+label. The branch rules still require a current approval, successful checks and
+resolved discussions; no bypass actor is added.
+
+Rollback: set `can_approve_pull_request_reviews` back to `false` and apply that
+resource. Remove the opt-in label to stop a pending individual approval.
