@@ -114,9 +114,11 @@ GitHub Free does not support enforced private-repository rulesets; see
 [GitHub's availability documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
 The public `.github` profile retains its existing active protection and
 administrator bypass. Its Terraform resource address and remote ID are unchanged.
-The six public code repositories require two current approving reviews and
-resolved review threads, and protect history without administrator or automation
-bypasses. See [public security policy](docs/public-security.md) for activation.
+The six audited public code repositories retain their current review and bypass
+settings until explicitly activated through `public_security_enforcement_repositories`.
+Activation requires verified approval automation and enables one current approval
+without bypasses. Existing required CI checks remain in place. See the
+[public security policy](docs/public-security.md) for activation.
 No private-repository access policy changes are implied.
 
 ### Existing repository ownership
