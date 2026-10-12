@@ -98,7 +98,7 @@ resource "github_repository_ruleset" "tuya_esphome" {
     non_fast_forward = true
     pull_request {
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 2
+      required_approving_review_count   = 1
       dismiss_stale_reviews_on_push     = true
       require_last_push_approval        = true
       required_review_thread_resolution = true
@@ -170,7 +170,7 @@ resource "github_repository_ruleset" "zigbee_direct_button" {
     non_fast_forward = true
     pull_request {
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 2
+      required_approving_review_count   = 1
       dismiss_stale_reviews_on_push     = true
       require_last_push_approval        = true
       required_review_thread_resolution = true
@@ -258,7 +258,7 @@ resource "github_repository_ruleset" "desloc" {
       dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "ha-desloc")
       require_last_push_approval        = contains(local.active_public_software_repositories, "ha-desloc")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-desloc") ? 2 : 0
+      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-desloc") ? 1 : 0
       required_review_thread_resolution = true
     }
   }
@@ -294,7 +294,7 @@ resource "github_repository_ruleset" "desloc_card" {
       dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "ha-desloc-card")
       require_last_push_approval        = contains(local.active_public_software_repositories, "ha-desloc-card")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-desloc-card") ? 2 : 0
+      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-desloc-card") ? 1 : 0
       required_review_thread_resolution = true
     }
   }
@@ -330,7 +330,7 @@ resource "github_repository_ruleset" "echo_dot" {
       dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "ha-echo-dot")
       require_last_push_approval        = contains(local.active_public_software_repositories, "ha-echo-dot")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-echo-dot") ? 2 : 0
+      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-echo-dot") ? 1 : 0
       required_review_thread_resolution = true
     }
   }
@@ -366,7 +366,7 @@ resource "github_repository_ruleset" "echo_show_5" {
       dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "ha-echo-show-5")
       require_last_push_approval        = contains(local.active_public_software_repositories, "ha-echo-show-5")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-echo-show-5") ? 2 : 0
+      required_approving_review_count   = contains(local.active_public_software_repositories, "ha-echo-show-5") ? 1 : 0
       required_review_thread_resolution = true
     }
   }
@@ -402,7 +402,7 @@ resource "github_repository_ruleset" "slzb_06_recovery" {
       dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "slzb-06-recovery")
       require_last_push_approval        = contains(local.active_public_software_repositories, "slzb-06-recovery")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = contains(local.active_public_software_repositories, "slzb-06-recovery") ? 2 : 0
+      required_approving_review_count   = contains(local.active_public_software_repositories, "slzb-06-recovery") ? 1 : 0
       required_review_thread_resolution = true
     }
   }
@@ -438,7 +438,7 @@ resource "github_repository_ruleset" "rf_airbridge" {
       dismiss_stale_reviews_on_push     = contains(local.active_public_software_repositories, "rf-airbridge")
       require_last_push_approval        = contains(local.active_public_software_repositories, "rf-airbridge")
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = contains(local.active_public_software_repositories, "rf-airbridge") ? 2 : 0
+      required_approving_review_count   = contains(local.active_public_software_repositories, "rf-airbridge") ? 1 : 0
       required_review_thread_resolution = true
     }
   }
