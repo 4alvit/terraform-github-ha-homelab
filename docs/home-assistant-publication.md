@@ -55,3 +55,15 @@ vulnerability alerts and Dependabot settings, then the separately named public
 resources. Review each actual plan and confirm the predecessor keeps the same
 GitHub repository ID. A final scoped no-change plan verifies this migration;
 any remaining full-workspace drift needs separate review.
+
+### Name-keyed Dependabot state
+
+The provider did not automatically update the predecessor's name-keyed
+Dependabot resource during the repository rename. Before reusing the old URL,
+re-import that setting at the same Terraform address using
+`home-assistant-private` and verify automated security fixes remain enabled.
+Replacing the vulnerability-alert setting can disable automated fixes as a
+side effect; restore the existing enabled policy if necessary and verify it
+through the GitHub API. Never refresh an obsolete name after assigning that
+name to another repository. No repository object is deleted by this state
+reconciliation.
