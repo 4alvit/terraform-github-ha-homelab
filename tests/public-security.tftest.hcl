@@ -8,7 +8,7 @@ mock_provider "github" {
   }
 }
 
-run "existing_public_rules_require_two_current_reviews" {
+run "existing_public_rules_require_one_current_review" {
   command = plan
   assert {
     condition = length(local.active_public_software_repositories) == 6 && alltrue([
@@ -21,13 +21,13 @@ run "existing_public_rules_require_two_current_reviews" {
         github_repository_ruleset.rf_airbridge
         ] : (
         length(policy.bypass_actors) == 0 &&
-        one(one(policy.rules).pull_request).required_approving_review_count == 2 &&
+        one(one(policy.rules).pull_request).required_approving_review_count == 1 &&
         one(one(policy.rules).pull_request).dismiss_stale_reviews_on_push &&
         one(one(policy.rules).pull_request).require_last_push_approval &&
         one(one(policy.rules).pull_request).required_review_thread_resolution
       )
     ])
-    error_message = "Every actual public software ruleset must require two current reviews without bypass."
+    error_message = "Every actual public software ruleset must require one current review without bypass."
   }
 }
 
@@ -114,7 +114,7 @@ run "new_public_button_repository_has_protections_without_live_lookup" {
       one(one(github_repository.repositories["zigbee-direct-button"].security_and_analysis).secret_scanning).status == "enabled" &&
       one(one(github_repository.repositories["zigbee-direct-button"].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
       length(github_repository_ruleset.zigbee_direct_button.bypass_actors) == 0 &&
-      one(one(github_repository_ruleset.zigbee_direct_button.rules).pull_request).required_approving_review_count == 2 &&
+      one(one(github_repository_ruleset.zigbee_direct_button.rules).pull_request).required_approving_review_count == 1 &&
       one(one(github_repository_ruleset.zigbee_direct_button.rules).pull_request).dismiss_stale_reviews_on_push &&
       one(one(github_repository_ruleset.zigbee_direct_button.rules).pull_request).require_last_push_approval &&
       one(one(github_repository_ruleset.zigbee_direct_button.rules).pull_request).required_review_thread_resolution
@@ -133,12 +133,12 @@ run "new_public_conversion_repository_has_protections_without_live_lookup" {
       toset(one(one(github_repository_ruleset.tuya_esphome.conditions).ref_name).include) == toset(["~DEFAULT_BRANCH"]) &&
       length(one(one(github_repository_ruleset.tuya_esphome.conditions).ref_name).exclude) == 0 &&
       length(github_repository_ruleset.tuya_esphome.bypass_actors) == 0 &&
-      one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).required_approving_review_count == 2 &&
+      one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).required_approving_review_count == 1 &&
       one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).dismiss_stale_reviews_on_push &&
       one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).require_last_push_approval &&
       one(one(github_repository_ruleset.tuya_esphome.rules).pull_request).required_review_thread_resolution
     )
-    error_message = "The new conversion repository must require secret protection and two current reviews without bypass."
+    error_message = "The new conversion repository must require secret protection and one current review without bypass."
   }
 }
 
@@ -181,7 +181,7 @@ run "public_home_assistant_protects_reviewed_main" {
       length(github_repository_ruleset.home_assistant_public.bypass_actors) == 0 &&
       one(github_repository_ruleset.home_assistant_public.rules).deletion &&
       one(github_repository_ruleset.home_assistant_public.rules).non_fast_forward &&
-      one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).required_approving_review_count == 2 &&
+      one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).required_approving_review_count == 1 &&
       one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).dismiss_stale_reviews_on_push &&
       one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).require_last_push_approval &&
       toset([for check in one(one(github_repository_ruleset.home_assistant_public.rules).required_status_checks).required_check : check.context]) == toset(["validate", "maintenance-runtime"])

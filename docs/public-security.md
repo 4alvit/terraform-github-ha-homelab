@@ -2,7 +2,7 @@
 
 `public-security.tf` lists the public repositories reviewed for this rollout.
 Live metadata excludes private and archived repositories from new protections.
-Existing public review rules require two approving reviews, dismiss stale
+Existing public review rules require one approving review, dismiss stale
 approvals and require resolution of review threads. Administrator and automation
 bypass actors are removed for this scope. Missing review rules are added without
 replacing existing status checks or immutable-tag rules. Existing release CI
@@ -17,8 +17,8 @@ onboarding. Do not put a credential in a commit to test push protection.
 New public repositories may set `enable_secret_scanning = true` in the declared
 inventory, so protection is enabled during creation without querying a repository
 that does not exist yet. The visibility guard still excludes private repositories.
-`zigbee-direct-button` uses this path and has its own ruleset with the same two
-current approvals and no bypass. During initial provisioning, create only its
+`zigbee-direct-button` uses this path and has its own ruleset with one
+current approval and no bypass. During initial provisioning, create only its
 repository, default branch, and security-update resources with a reviewed targeted
 plan; publish the initial source, then apply its ruleset and run a complete plan.
 The final configuration must include the ruleset. This bootstrap sequence does
@@ -33,10 +33,26 @@ the API, import its actual repository/ruleset identity at the declared address
 before applying; do not create a duplicate rule. For out-of-band setting changes,
 refresh and inspect the plan to verify the source preserves them.
 
-Two required reviews are an ongoing maintenance requirement. Automation approvals
-are not evidence of an independent human security review. Do not weaken the rule
-or grant a new collaborator access merely to make an old PR mergeable. Check
-whether existing permitted maintainers can complete the reviews before activation.
+One current approval from a reviewer with Write access satisfies the review
+count. Automation may provide that approval; it does not replace the required CI
+checks or resolution of review threads. Keep the count at one when reconciling
+Terraform with GitHub so a later apply cannot restore a two-review requirement.
+
+## Extra Copilot approval after Terraform
+
+GitHub's `require_extra_approval_for_unattributed_changes` setting must be
+`false`: otherwise an unattributed Copilot PR needs an extra approval even when
+the configured count is one. The pinned GitHub provider does not expose this
+field, and sending a ruleset without it restores GitHub's default `true`.
+
+After a ruleset apply or creation, run the shared
+[review-policy reconciliation script](https://github.com/4alvit/terraform-github-4alvit/blob/main/scripts/reconcile-review-policy.py)
+with `--owner OWNER` to inspect that owner's rules. Use `--apply --backup-dir DIR`
+to save the current bodies, change only review counts above one and the extra
+approval flag, and verify that all other protections remain intact. Choose a new
+local backup directory for each application. Rules without required approvals
+keep their zero count. This step is required until the provider supports the
+extra-approval field; a Terraform plan alone cannot validate it.
 
 ## Trust boundaries
 
