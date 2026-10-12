@@ -41,6 +41,13 @@ automations, scripts, household data, and credentials belong in private reposito
 - `ha-homelab/.github` — public organization profile and original logo assets.
 
 Repository contents and deployment workflows are maintained in those repositories.
+`desloc-coderabbit.tf` grants `californiantiramisu` the Write role on the two
+active, public DESLOC repositories so it can request CodeRabbit autofixes.
+This is repository-scoped access, without an administrator role or ruleset bypass.
+If GitHub creates collaborator invitations, the bot account must accept them
+before autofix can run. Verify effective Write access and the CodeRabbit response;
+a successfully posted command does not prove that an autofix was accepted.
+
 This project does not deploy or reload Home Assistant. Its own repository settings
 belong to [terraform-github-4alvit](https://github.com/4alvit/terraform-github-4alvit).
 The existing organization settings are imported, preserving billing and access

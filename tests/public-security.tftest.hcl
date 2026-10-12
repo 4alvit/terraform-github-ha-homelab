@@ -32,7 +32,8 @@ run "existing_public_rules_require_two_current_reviews" {
 }
 
 run "private_repository_preserves_existing_policy" {
-  command = plan
+  command         = plan
+  expect_failures = [github_repository_collaborator.desloc_coderabbit["ha-desloc"]]
   override_data {
     target = data.github_repository.public_software["ha-desloc"]
     values = {
@@ -54,7 +55,8 @@ run "private_repository_preserves_existing_policy" {
 }
 
 run "archived_repository_preserves_existing_policy" {
-  command = plan
+  command         = plan
+  expect_failures = [github_repository_collaborator.desloc_coderabbit["ha-desloc"]]
   override_data {
     target = data.github_repository.public_software["ha-desloc"]
     values = {
@@ -72,6 +74,22 @@ run "archived_repository_preserves_existing_policy" {
       length(github_repository.repositories["ha-desloc"].security_and_analysis) == 0
     )
     error_message = "An excluded repository must retain its existing policy and receive no public security settings."
+  }
+}
+
+run "coderabbit_write_access_is_limited_to_desloc" {
+  command = plan
+  assert {
+    condition = (
+      toset(keys(github_repository_collaborator.desloc_coderabbit)) == toset(["ha-desloc", "ha-desloc-card"]) &&
+      alltrue([
+        for name, collaborator in github_repository_collaborator.desloc_coderabbit :
+        collaborator.repository == name &&
+        collaborator.username == "californiantiramisu" &&
+        collaborator.permission == "push"
+      ])
+    )
+    error_message = "Only the two DESLOC repositories may grant the autofix account Write access."
   }
 }
 
