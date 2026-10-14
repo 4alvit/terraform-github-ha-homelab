@@ -9,6 +9,11 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Public project ownership
 
+- `ha-homelab/ha-lg-tv-capture` — public, MIT-licensed LG webOS TV screen capture
+  tooling and Home Assistant integration. Private floorplans consume the reusable
+  code from this repository; household configuration, captured images and
+  credentials stay private.
+
 - `ha-homelab/zigbee-direct-button` — public Tuya button firmware for direct
   Zigbee group control: short-press toggle and hold-to-off, reproducible builds,
   Home Assistant setup, backup, upgrades, and troubleshooting. Credentials,
@@ -133,6 +138,28 @@ block for the existing `github_repository.repositories["name"]` resource before
 applying; review the plan to avoid recreating or changing its visibility. Inventory
 and import any existing default-branch, security-settings or ruleset resources at
 their corresponding addresses as well. Never commit state or credentials.
+
+## LG TV capture bootstrap
+
+Provision `ha-lg-tv-capture` with its generated README, secret scanning, push
+protection, Dependabot and read-only workflow-token defaults. Publish the reviewed
+source and MIT license through a pull request, then activate
+`github_repository_ruleset.lg_tv_capture` when the source workflow provides
+`CI gate`. The ruleset requires one current approval without bypasses and allows
+only squash merging. Auto-merge is available after the required checks and review.
+Release workflows and source files are owned by the capture repository.
+
+After the source PR is merged and its workflow checks pass, enable release
+publication through `github_actions_variable.lg_tv_capture_release_publication`.
+It depends on the protected version tags and the `release` environment, whose
+deployment policy allows only `main` and whose reviewer is `4alvit`. The environment
+follows the existing single-maintainer policy: the owner may approve a promotion
+they triggered and administrators may bypass environment approval. Branch and
+version-tag rulesets have no bypass actors. No production environment is created.
+
+Review a targeted remote plan for the new repository's resources during this
+bootstrap; do not apply unrelated workspace drift. Finish with a new remote plan
+and verify the live public visibility and protections.
 
 ## Validation
 

@@ -8,6 +8,50 @@ mock_provider "github" {
   }
 }
 
+run "new_capture_repository_requires_current_review_and_ci" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.repositories["ha-lg-tv-capture"].visibility == "public" &&
+      github_repository.repositories["ha-lg-tv-capture"].has_issues &&
+      github_repository.repositories["ha-lg-tv-capture"].allow_auto_merge &&
+      one(one(github_repository.repositories["ha-lg-tv-capture"].security_and_analysis).secret_scanning).status == "enabled" &&
+      one(one(github_repository.repositories["ha-lg-tv-capture"].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
+      github_workflow_repository_permissions.lg_tv_capture.default_workflow_permissions == "read" &&
+      github_workflow_repository_permissions.lg_tv_capture.can_approve_pull_request_reviews &&
+      github_repository_ruleset.lg_tv_capture.enforcement == "active" &&
+      length(github_repository_ruleset.lg_tv_capture.bypass_actors) == 0 &&
+      one(one(github_repository_ruleset.lg_tv_capture.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.lg_tv_capture.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.lg_tv_capture.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.lg_tv_capture.rules).pull_request).required_review_thread_resolution &&
+      toset([for check in one(one(github_repository_ruleset.lg_tv_capture.rules).required_status_checks).required_check : check.context]) == toset(["CI gate"])
+    )
+    error_message = "The new capture repository must protect secrets and require its CI gate with one current review and no bypass."
+  }
+}
+
+run "capture_release_requires_owner_approval_and_immutable_tags" {
+  command = plan
+  assert {
+    condition = (
+      github_repository_environment.lg_tv_capture_release.environment == "release" &&
+      one(github_repository_environment.lg_tv_capture_release.reviewers).users == toset([272257197]) &&
+      one(github_repository_environment.lg_tv_capture_release.deployment_branch_policy).custom_branch_policies &&
+      !one(github_repository_environment.lg_tv_capture_release.deployment_branch_policy).protected_branches &&
+      github_repository_environment_deployment_policy.lg_tv_capture_release.branch_pattern == "main" &&
+      github_repository_ruleset.lg_tv_capture_release_tags.target == "tag" &&
+      github_repository_ruleset.lg_tv_capture_release_tags.enforcement == "active" &&
+      length(github_repository_ruleset.lg_tv_capture_release_tags.bypass_actors) == 0 &&
+      one(one(github_repository_ruleset.lg_tv_capture_release_tags.conditions).ref_name).include == tolist(["refs/tags/v*"]) &&
+      one(github_repository_ruleset.lg_tv_capture_release_tags.rules).deletion &&
+      one(github_repository_ruleset.lg_tv_capture_release_tags.rules).update &&
+      one(github_repository_ruleset.lg_tv_capture_release_tags.rules).non_fast_forward
+    )
+    error_message = "Capture releases must use main-only owner approval and immutable version tags without a tag bypass."
+  }
+}
+
 run "existing_public_rules_require_one_current_review" {
   command = plan
   variables {

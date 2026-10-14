@@ -1,5 +1,13 @@
 locals {
   repositories = {
+    ha-lg-tv-capture = {
+      description            = "LG webOS TV screen capture for Home Assistant: reusable capture tooling and integrations"
+      visibility             = "public"
+      has_issues             = true
+      enable_secret_scanning = true
+      allow_auto_merge       = true
+      topics                 = ["home-assistant", "lg", "webos", "screen-capture", "python"]
+    }
     zigbee-direct-button = {
       description            = "Direct Zigbee group control for Tuya buttons: short-press toggle, hold-to-off, reproducible firmware and Home Assistant guides"
       visibility             = "public"
