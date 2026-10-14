@@ -149,6 +149,14 @@ source and MIT license through a pull request, then activate
 only squash merging. Auto-merge is available after the required checks and review.
 Release workflows and source files are owned by the capture repository.
 
+After the source PR is merged and its workflow checks pass, enable release
+publication through `github_actions_variable.lg_tv_capture_release_publication`.
+It depends on the protected version tags and the `release` environment, whose
+deployment policy allows only `main` and whose reviewer is `4alvit`. The environment
+follows the existing single-maintainer policy: the owner may approve a promotion
+they triggered and administrators may bypass environment approval. Branch and
+version-tag rulesets have no bypass actors. No production environment is created.
+
 Review a targeted remote plan for the new repository's resources during this
 bootstrap; do not apply unrelated workspace drift. Finish with a new remote plan
 and verify the live public visibility and protections.
