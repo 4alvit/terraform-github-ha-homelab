@@ -8,6 +8,24 @@ mock_provider "github" {
   }
 }
 
+run "zac93_requires_source_and_secret_checks_without_bypass" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.repositories["zac93-esp32"].visibility == "public" &&
+      one(one(github_repository.repositories["zac93-esp32"].security_and_analysis).secret_scanning).status == "enabled" &&
+      one(one(github_repository.repositories["zac93-esp32"].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
+      github_repository_ruleset.zac93_publication.enforcement == "active" &&
+      length(github_repository_ruleset.zac93_publication.bypass_actors) == 0 &&
+      one(github_repository_ruleset.zac93_publication.rules).deletion &&
+      one(github_repository_ruleset.zac93_publication.rules).non_fast_forward &&
+      one(one(github_repository_ruleset.zac93_publication.rules).required_status_checks).strict_required_status_checks_policy &&
+      toset([for check in one(one(github_repository_ruleset.zac93_publication.rules).required_status_checks).required_check : check.context]) == toset(["check", "secrets"])
+    )
+    error_message = "The ZAC93 guide must protect secrets and require both publication checks without a bypass."
+  }
+}
+
 run "new_echomuse_repository_requires_secrets_review_and_ci_protection" {
   command = plan
   assert {
