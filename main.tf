@@ -1,5 +1,12 @@
 locals {
   repositories = {
+    zac93-esp32 = {
+      description            = "Illustrated Zooz ZAC93 Z-Wave bridge guide for ESP32-WROOM and ESP32-S3, ESPHome, Z-Wave JS and Home Assistant"
+      visibility             = "public"
+      has_issues             = true
+      enable_secret_scanning = true
+      topics                 = ["zac93", "z-wave", "esphome", "esp32", "esp32-s3", "home-assistant", "zwave-js", "diy"]
+    }
     ha-lg-tv-capture = {
       description            = "LG webOS TV screen capture for Home Assistant: reusable capture tooling and integrations"
       visibility             = "public"
