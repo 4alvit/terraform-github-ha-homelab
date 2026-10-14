@@ -63,6 +63,23 @@ resource "github_repository_collaborator" "lg_tv_capture_coderabbit" {
   }
 }
 
+# Manage only this membership in the existing organization secret's allowlist.
+# The secret value, visibility and all other repository grants stay unmanaged.
+resource "github_actions_organization_secret_repository" "lg_tv_capture_bot_pat" {
+  secret_name   = "BOT_PAT"
+  repository_id = data.github_repository.lg_tv_capture_access.repo_id
+
+  lifecycle {
+    precondition {
+      condition = (
+        data.github_repository.lg_tv_capture_access.visibility == "public" &&
+        !data.github_repository.lg_tv_capture_access.archived
+      )
+      error_message = "Capture bot credential access is limited to the active, public LG TV capture repository."
+    }
+  }
+}
+
 resource "github_repository_ruleset" "lg_tv_capture_release_tags" {
   name        = "Release standard - immutable version tags"
   repository  = github_repository.repositories["ha-lg-tv-capture"].name

@@ -161,8 +161,11 @@ run "capture_bot_access_grants_only_repository_write" {
 }
 
 run "capture_bot_access_rejects_private_repository" {
-  command         = plan
-  expect_failures = [github_repository_collaborator.lg_tv_capture_coderabbit]
+  command = plan
+  expect_failures = [
+    github_repository_collaborator.lg_tv_capture_coderabbit,
+    github_actions_organization_secret_repository.lg_tv_capture_bot_pat,
+  ]
   override_data {
     target = data.github_repository.lg_tv_capture_access
     values = {
@@ -173,14 +176,36 @@ run "capture_bot_access_rejects_private_repository" {
 }
 
 run "capture_bot_access_rejects_archived_repository" {
-  command         = plan
-  expect_failures = [github_repository_collaborator.lg_tv_capture_coderabbit]
+  command = plan
+  expect_failures = [
+    github_repository_collaborator.lg_tv_capture_coderabbit,
+    github_actions_organization_secret_repository.lg_tv_capture_bot_pat,
+  ]
   override_data {
     target = data.github_repository.lg_tv_capture_access
     values = {
       visibility = "public"
       archived   = true
     }
+  }
+}
+
+run "capture_bot_secret_access_is_one_existing_secret_membership" {
+  command = plan
+  override_data {
+    target = data.github_repository.lg_tv_capture_access
+    values = {
+      repo_id    = 1418228196
+      visibility = "public"
+      archived   = false
+    }
+  }
+  assert {
+    condition = (
+      github_actions_organization_secret_repository.lg_tv_capture_bot_pat.secret_name == "BOT_PAT" &&
+      github_actions_organization_secret_repository.lg_tv_capture_bot_pat.repository_id == 1418228196
+    )
+    error_message = "Only the LG TV capture repository may be added to the existing BOT_PAT allowlist."
   }
 }
 
