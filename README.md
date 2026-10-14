@@ -9,6 +9,12 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Public project ownership
 
+- `ha-homelab/zac93-esp32` — illustrated ZAC93 bridge guide for ESP32-WROOM
+  and ESP32-S3, with ESPHome configuration, Home Assistant setup and diagnostics.
+  Local hooks and CI reject private artifacts and secrets; the default branch
+  requires both `check` and `secrets` without a bypass. Wi-Fi/API credentials,
+  firmware builds and Z-Wave controller backups remain private.
+
 - `ha-homelab/ha-lg-tv-capture` — public, MIT-licensed LG webOS TV screen capture
   tooling and Home Assistant integration. Private floorplans consume the reusable
   code from this repository; household configuration, captured images and
