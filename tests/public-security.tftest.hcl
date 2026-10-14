@@ -130,7 +130,7 @@ run "archived_repository_preserves_existing_policy" {
   }
 }
 
-run "coderabbit_write_access_is_limited_to_desloc" {
+run "desloc_coderabbit_access_remains_limited_to_desloc" {
   command = plan
   assert {
     condition = (
@@ -142,7 +142,45 @@ run "coderabbit_write_access_is_limited_to_desloc" {
         collaborator.permission == "push"
       ])
     )
-    error_message = "Only the two DESLOC repositories may grant the autofix account Write access."
+    error_message = "The DESLOC collaborator resource must remain limited to its two repositories."
+  }
+}
+
+run "capture_bot_access_grants_only_repository_write" {
+  command = plan
+  assert {
+    condition = (
+      github_repository_collaborator.lg_tv_capture_coderabbit.repository == "ha-lg-tv-capture" &&
+      github_repository_collaborator.lg_tv_capture_coderabbit.username == "californiantiramisu" &&
+      github_repository_collaborator.lg_tv_capture_coderabbit.permission == "push" &&
+      length(github_repository_ruleset.lg_tv_capture.bypass_actors) == 0 &&
+      one(one(github_repository_ruleset.lg_tv_capture.rules).pull_request).required_approving_review_count == 1
+    )
+    error_message = "Capture bot access must grant only repository Write and preserve review without bypass."
+  }
+}
+
+run "capture_bot_access_rejects_private_repository" {
+  command         = plan
+  expect_failures = [github_repository_collaborator.lg_tv_capture_coderabbit]
+  override_data {
+    target = data.github_repository.lg_tv_capture_access
+    values = {
+      visibility = "private"
+      archived   = false
+    }
+  }
+}
+
+run "capture_bot_access_rejects_archived_repository" {
+  command         = plan
+  expect_failures = [github_repository_collaborator.lg_tv_capture_coderabbit]
+  override_data {
+    target = data.github_repository.lg_tv_capture_access
+    values = {
+      visibility = "public"
+      archived   = true
+    }
   }
 }
 

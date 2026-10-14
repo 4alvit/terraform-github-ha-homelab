@@ -41,6 +41,28 @@ resource "github_workflow_repository_permissions" "lg_tv_capture" {
   can_approve_pull_request_reviews = true
 }
 
+data "github_repository" "lg_tv_capture_access" {
+  full_name = "ha-homelab/ha-lg-tv-capture"
+}
+
+# Match the public DESLOC bot-access pattern for review and CodeRabbit autofix.
+# Write access does not grant administration or bypass the repository rules.
+resource "github_repository_collaborator" "lg_tv_capture_coderabbit" {
+  repository = "ha-lg-tv-capture"
+  username   = "californiantiramisu"
+  permission = "push"
+
+  lifecycle {
+    precondition {
+      condition = (
+        data.github_repository.lg_tv_capture_access.visibility == "public" &&
+        !data.github_repository.lg_tv_capture_access.archived
+      )
+      error_message = "Capture bot review access is limited to the active, public LG TV capture repository."
+    }
+  }
+}
+
 resource "github_repository_ruleset" "lg_tv_capture_release_tags" {
   name        = "Release standard - immutable version tags"
   repository  = github_repository.repositories["ha-lg-tv-capture"].name
