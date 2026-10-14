@@ -53,6 +53,7 @@ locals {
       visibility             = "public"
       has_issues             = true
       enable_secret_scanning = true
+      allow_auto_merge       = true
       topics                 = ["amazon-echo", "echo-dot", "echomuse", "home-assistant", "openwakeword", "voice-assistant"]
     }
     ha-desloc = {

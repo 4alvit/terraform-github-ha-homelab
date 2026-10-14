@@ -365,3 +365,58 @@ run "existing_ci_and_auto_merge_settings_are_preserved" {
     error_message = "The existing automatic merge and mandatory CI settings must not regress."
   }
 }
+
+run "echomuse_bot_uses_existing_secret_and_repository_write" {
+  command = plan
+  override_data {
+    target = data.github_repository.echomuse_access
+    values = {
+      visibility = "public"
+      archived   = false
+      repo_id    = 12345
+    }
+  }
+  assert {
+    condition = (
+      github_repository.repositories["ha-echomuse"].allow_auto_merge &&
+      github_workflow_repository_permissions.echomuse.default_workflow_permissions == "read" &&
+      github_workflow_repository_permissions.echomuse.can_approve_pull_request_reviews &&
+      github_repository_collaborator.echomuse_bot.repository == "ha-echomuse" &&
+      github_repository_collaborator.echomuse_bot.username == "californiantiramisu" &&
+      github_repository_collaborator.echomuse_bot.permission == "push" &&
+      github_actions_organization_secret_repository.echomuse_bot_pat.secret_name == "BOT_PAT" &&
+      github_actions_organization_secret_repository.echomuse_bot_pat.repository_id == 12345
+    )
+    error_message = "EchoMuse must use independent bot write access, read-only token defaults, and one existing secret membership."
+  }
+}
+
+run "echomuse_bot_rejects_private_repository" {
+  command = plan
+  override_data {
+    target = data.github_repository.echomuse_access
+    values = {
+      visibility = "private"
+      archived   = false
+    }
+  }
+  expect_failures = [
+    github_repository_collaborator.echomuse_bot,
+    github_actions_organization_secret_repository.echomuse_bot_pat,
+  ]
+}
+
+run "echomuse_bot_rejects_archived_repository" {
+  command = plan
+  override_data {
+    target = data.github_repository.echomuse_access
+    values = {
+      visibility = "public"
+      archived   = true
+    }
+  }
+  expect_failures = [
+    github_repository_collaborator.echomuse_bot,
+    github_actions_organization_secret_repository.echomuse_bot_pat,
+  ]
+}
