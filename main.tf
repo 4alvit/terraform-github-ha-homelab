@@ -48,6 +48,13 @@ locals {
       has_issues  = true
       topics      = ["amazon-echo", "echo-dot", "echolocal", "home-assistant", "microwakeword", "voice-assistant"]
     }
+    ha-echomuse = {
+      description            = "Reproducible EchoMuse deployment and Home Assistant integration for repurposed Echo Dot 2 devices"
+      visibility             = "public"
+      has_issues             = true
+      enable_secret_scanning = true
+      topics                 = ["amazon-echo", "echo-dot", "echomuse", "home-assistant", "openwakeword", "voice-assistant"]
+    }
     ha-desloc = {
       description = "Unofficial DESLOC C100 Plus cloud integration for Home Assistant: lock control, state, battery and Wi-Fi signal"
       visibility  = "public"

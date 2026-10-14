@@ -37,6 +37,11 @@ automations, scripts, household data, and credentials belong in private reposito
 - `ha-homelab/ha-echo-dot` — public Echo Dot 2 conversion and Home Assistant
   integration guides, reproducible wake-word training and exact-runtime checks.
   Firmware, audio, trained weights, credentials and household data are excluded.
+- `ha-homelab/ha-echomuse` — public EchoMuse deployment and Home Assistant
+  integration for repurposed Echo Dot 2 devices. Device backups, credentials,
+  recordings, and household identifiers are excluded. Bootstrap its repository,
+  default branch, vulnerability alerts, and Dependabot security updates first;
+  publish reviewed source and verify the `CI gate` before applying its ruleset.
 - `ha-homelab/ha-desloc-card` — public Lovelace dashboard card for the DESLOC
   integration, distributed separately through HACS.
 
