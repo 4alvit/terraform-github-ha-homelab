@@ -8,6 +8,29 @@ mock_provider "github" {
   }
 }
 
+run "new_echomuse_repository_requires_secrets_review_and_ci_protection" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.repositories["ha-echomuse"].visibility == "public" &&
+      github_repository.repositories["ha-echomuse"].has_issues &&
+      one(one(github_repository.repositories["ha-echomuse"].security_and_analysis).secret_scanning).status == "enabled" &&
+      one(one(github_repository.repositories["ha-echomuse"].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
+      github_branch_default.main["ha-echomuse"].branch == "main" &&
+      github_repository_ruleset.echomuse.enforcement == "active" &&
+      length(github_repository_ruleset.echomuse.bypass_actors) == 0 &&
+      one(github_repository_ruleset.echomuse.rules).deletion &&
+      one(github_repository_ruleset.echomuse.rules).non_fast_forward &&
+      one(one(github_repository_ruleset.echomuse.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.echomuse.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.echomuse.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.echomuse.rules).pull_request).required_review_thread_resolution &&
+      toset([for check in one(one(github_repository_ruleset.echomuse.rules).required_status_checks).required_check : check.context]) == toset(["CI gate"])
+    )
+    error_message = "EchoMuse must bootstrap with secret protection and require its CI gate and one current review without a bypass."
+  }
+}
+
 run "new_capture_repository_requires_current_review_and_ci" {
   command = plan
   assert {
