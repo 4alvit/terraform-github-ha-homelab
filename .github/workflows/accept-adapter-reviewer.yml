@@ -1,0 +1,65 @@
+name: Accept public adapter reviewer invitations
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-adapter-reviewer-invitations
+  cancel-in-progress: false
+
+jobs:
+  accept:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25
+        with:
+          egress-policy: audit
+      # Metadata only: no checkout and no execution of repository or PR code.
+      - name: Accept only Terraform-managed adapter invitations
+        shell: python3 -I {0}
+        env:
+          GH_TOKEN: ${{ secrets.BOT_PAT }}
+        run: |
+          import json
+          import subprocess
+
+          allowed = {
+              "ha-homelab/ha-onvif-room-direction",
+              "ha-homelab/ruview-home-assistant",
+              "ha-homelab/ha-access-session",
+              "ha-homelab/sensing-evidence-kit",
+          }
+
+          def api(path, method="GET", paginate=False):
+              command = ["gh", "api", "--method", method, path]
+              if paginate:
+                  command.extend(["--paginate", "--slurp"])
+              result = subprocess.run(command, capture_output=True, text=True, timeout=60)
+              if result.returncode:
+                  raise RuntimeError("GitHub metadata request failed; no credential output retained")
+              return json.loads(result.stdout) if result.stdout.strip() else None
+
+          if api("user")["login"].lower() != "californiantiramisu":
+              raise RuntimeError("BOT_PAT must belong to the Terraform-managed reviewer")
+          accepted = 0
+          for page in api("user/repository_invitations?per_page=100", paginate=True):
+              for invitation in page:
+                  repository = invitation["repository"]["full_name"]
+                  if repository not in allowed:
+                      continue
+                  if invitation["invitee"]["login"].lower() != "californiantiramisu":
+                      raise RuntimeError("Unexpected invitation recipient")
+                  if invitation["permissions"] != "write":
+                      raise RuntimeError("Expected exactly the Terraform-managed write permission")
+                  invitation_id = invitation["id"]
+                  if type(invitation_id) is not int or invitation_id <= 0:
+                      raise RuntimeError("Invalid invitation identity")
+                  api(f"user/repository_invitations/{invitation_id}", method="PATCH")
+                  print(f"Accepted reviewer invitation: {repository}")
+                  accepted += 1
+          print(f"Accepted {accepted} scoped invitations; unrelated invitations were untouched.")
