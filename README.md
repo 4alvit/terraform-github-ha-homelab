@@ -9,6 +9,21 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Public project ownership
 
+The reusable adapters in `public-adapters.tf` start with fresh public history:
+
+- `ha-onvif-room-direction` — read-only camera direction mapped to configured areas.
+- `ruview-home-assistant` — expiring per-node observations through MQTT discovery.
+- `ha-access-session` — signed Access identity exchange and a restricted HA gateway.
+- `sensing-evidence-kit` — independent labels and reproducible sensing characterization.
+
+Each receives secret scanning and push protection, one independent PR approval,
+the required `CI gate`, immutable version tags, and a main-only stable-release
+environment. The existing review bot has Write access and receives only its own
+membership in the existing `BOT_PAT` secret allowlist. Source and release pipelines
+are owned by each project; no household configuration or Git history is migrated.
+Public hosted runners execute their initial CI. The private home consumes reviewed
+public versions while retaining deployment, geometry and device bindings privately.
+
 - `ha-homelab/zac93-esp32` — illustrated ZAC93 bridge guide for ESP32-WROOM
   and ESP32-S3, with ESPHome configuration, Home Assistant setup and diagnostics.
   Local hooks and CI reject private artifacts and secrets; the default branch
