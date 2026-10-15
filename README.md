@@ -187,6 +187,24 @@ Review a targeted remote plan for the new repository's resources during this
 bootstrap; do not apply unrelated workspace drift. Finish with a new remote plan
 and verify the live public visibility and protections.
 
+## Activate the public adapter reviewer
+
+Creating a `github_repository_collaborator` can leave a pending invitation. Until
+the bot accepts it, GitHub may let it post a review as a public reader without
+counting that review toward branch protection. After the four public adapter
+repositories have been applied, run the metadata-only workflow from `main`:
+
+```sh
+gh workflow run accept-adapter-reviewer.yml --ref main
+```
+
+The existing `BOT_PAT` must belong to `californiantiramisu`. The workflow accepts
+only that user's write invitations for the four repositories in
+`local.public_adapters`. It does not create permissions, accept other invitations,
+check out source, approve PRs, or bypass protections. Re-running is safe: already
+accepted invitations are no longer returned. Verify the bot has `write`
+permission, then rerun each repository's normal review workflow if necessary.
+
 ## Validation
 
 ```sh
