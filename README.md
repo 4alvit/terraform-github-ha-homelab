@@ -242,3 +242,20 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for bug reports, proposed changes and tes
 [public security policy](docs/public-security.md) for review requirements,
 secret protection and rollout/state ownership. OpenSSF readiness is assessed
 for this infrastructure repository separately from the projects it manages.
+
+## EchoMuse documentation wiki
+
+The `ha-echomuse` entry explicitly enables its public GitHub wiki. Other
+repositories retain the default `has_wiki = false`; enabling documentation here
+changes neither repository visibility nor branch/review protection.
+
+The source documentation and reproducible wiki exporter live in
+[ha-echomuse](https://github.com/ha-homelab/ha-echomuse). Keep operational secrets,
+recordings and live device inventories out of both repositories. GitHub requires
+an initial wiki page before its separate Git repository can be cloned; content
+publication is performed from reviewed documentation after enabling the wiki.
+
+For this narrowly scoped change, inspect a remote plan targeted to
+`github_repository.repositories["ha-echomuse"]`. Apply only if the planned
+resource change is the wiki flag. Do not apply unrelated organization drift as
+part of documentation publication.
