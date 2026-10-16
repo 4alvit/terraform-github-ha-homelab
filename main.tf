@@ -59,6 +59,7 @@ locals {
       description            = "Reproducible EchoMuse deployment and Home Assistant integration for repurposed Echo Dot 2 devices"
       visibility             = "public"
       has_issues             = true
+      has_wiki               = true
       enable_secret_scanning = true
       allow_auto_merge       = true
       topics                 = ["amazon-echo", "echo-dot", "echomuse", "home-assistant", "openwakeword", "voice-assistant"]
@@ -201,7 +202,7 @@ resource "github_repository" "repositories" {
   auto_init       = true
   has_issues      = try(each.value.has_issues, each.value.visibility == "private")
   has_projects    = false
-  has_wiki        = false
+  has_wiki        = try(each.value.has_wiki, false)
   has_discussions = false
 
   allow_merge_commit     = false
