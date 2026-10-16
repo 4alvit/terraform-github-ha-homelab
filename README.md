@@ -86,6 +86,20 @@ defaults. Organization creation and avatar selection are outside this configurat
 
 ## Home Assistant source repositories
 
+`home-studio.tf` looks up the existing public `ha-homelab/home-studio`
+repository and manages only its default-branch CI ruleset. Pull requests must
+pass the exact `CI gate` check from GitHub Actions (integration `15368`), with
+strict up-to-date checks and no bypass actors. The gate aggregates Home Studio's
+required package, browser, installation and workflow checks. No additional review
+count or merge-method restriction is introduced. Repository settings, collaborators,
+secrets and release environments are outside this resource's ownership.
+
+Before applying, verify the live check name and app identity, then review a remote
+plan targeted to `github_repository_ruleset.home_studio_ci`. It should create only
+that ruleset. A failing Home Studio gate must block merging; changing the ruleset
+does not fix or waive browser failures. Validate the live default-branch rules after
+apply and retain the reviewed plan outside this public repository.
+
 `home-assistant-private` retains the predecessor's private Git history at the
 existing `github_repository.repositories["home-assistant"]` Terraform address.
 The separately provisioned public `home-assistant` repository is owned by
