@@ -1,6 +1,43 @@
 locals {
   repositories = {
+    ha-entity-migrations = {
+      description            = "Offline semantic Home Assistant entity migration plans with role and hardware ownership"
+      visibility             = "public"
+      has_issues             = true
+      has_wiki               = true
+      enable_secret_scanning = true
+      allow_auto_merge       = true
+      topics                 = ["home-assistant", "python", "migration", "automation", "i18n"]
+    }
+    ha-meter-contracts = {
+      description            = "Validate Home Assistant meter topology, provenance, calibration evidence and aggregation"
+      visibility             = "public"
+      has_issues             = true
+      has_wiki               = true
+      enable_secret_scanning = true
+      allow_auto_merge       = true
+      topics                 = ["home-assistant", "energy", "metering", "python", "i18n"]
+    }
+    ha-scenario-tests = {
+      description            = "Run bounded synthetic scenarios in a real isolated Home Assistant automation engine"
+      visibility             = "public"
+      has_issues             = true
+      has_wiki               = true
+      enable_secret_scanning = true
+      allow_auto_merge       = true
+      topics                 = ["home-assistant", "testing", "automation", "python", "i18n"]
+    }
+    assist-scenario-lab = {
+      description            = "Offline voice scenario evidence: protocol completion, observed actions and audible responses"
+      visibility             = "public"
+      has_issues             = true
+      has_wiki               = true
+      enable_secret_scanning = true
+      allow_auto_merge       = true
+      topics                 = ["home-assistant", "assist", "voice-assistant", "testing", "i18n"]
+    }
     zac93-esp32 = {
+      has_wiki               = true
       description            = "Illustrated Zooz ZAC93 Z-Wave bridge guide for ESP32-WROOM and ESP32-S3, ESPHome, Z-Wave JS and Home Assistant"
       visibility             = "public"
       has_issues             = true
