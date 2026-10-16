@@ -9,6 +9,27 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Public project ownership
 
+The reusable adapters in `public-adapters.tf` start with fresh public history:
+
+- `ha-onvif-room-direction` — read-only camera direction mapped to configured areas.
+- `ruview-home-assistant` — expiring per-node observations through MQTT discovery.
+- `ha-access-session` — signed Access identity exchange and a restricted HA gateway.
+- `sensing-evidence-kit` — independent labels and reproducible sensing characterization.
+
+Each receives secret scanning and push protection, one independent PR approval,
+the required `CI gate`, immutable version tags, and a main-only stable-release
+environment. The existing review bot has Write access and receives only its own
+membership in the existing `BOT_PAT` secret allowlist. Source and release pipelines
+are owned by each project; no household configuration or Git history is migrated.
+Public hosted runners execute their initial CI. The private home consumes reviewed
+public versions while retaining deployment, geometry and device bindings privately.
+
+- `ha-homelab/zac93-esp32` — illustrated ZAC93 bridge guide for ESP32-WROOM
+  and ESP32-S3, with ESPHome configuration, Home Assistant setup and diagnostics.
+  Local hooks and CI reject private artifacts and secrets; the default branch
+  requires both `check` and `secrets` without a bypass. Wi-Fi/API credentials,
+  firmware builds and Z-Wave controller backups remain private.
+
 - `ha-homelab/ha-lg-tv-capture` — public, MIT-licensed LG webOS TV screen capture
   tooling and Home Assistant integration. Private floorplans consume the reusable
   code from this repository; household configuration, captured images and
@@ -64,6 +85,20 @@ The existing organization settings are imported, preserving billing and access
 defaults. Organization creation and avatar selection are outside this configuration.
 
 ## Home Assistant source repositories
+
+`home-studio.tf` looks up the existing public `ha-homelab/home-studio`
+repository and manages only its default-branch CI ruleset. Pull requests must
+pass the exact `CI gate` check from GitHub Actions (integration `15368`), with
+strict up-to-date checks and no bypass actors. The gate aggregates Home Studio's
+required package, browser, installation and workflow checks. No additional review
+count or merge-method restriction is introduced. Repository settings, collaborators,
+secrets and release environments are outside this resource's ownership.
+
+Before applying, verify the live check name and app identity, then review a remote
+plan targeted to `github_repository_ruleset.home_studio_ci`. It should create only
+that ruleset. A failing Home Studio gate must block merging; changing the ruleset
+does not fix or waive browser failures. Validate the live default-branch rules after
+apply and retain the reviewed plan outside this public repository.
 
 `home-assistant-private` retains the predecessor's private Git history at the
 existing `github_repository.repositories["home-assistant"]` Terraform address.
@@ -165,6 +200,24 @@ version-tag rulesets have no bypass actors. No production environment is created
 Review a targeted remote plan for the new repository's resources during this
 bootstrap; do not apply unrelated workspace drift. Finish with a new remote plan
 and verify the live public visibility and protections.
+
+## Activate the public adapter reviewer
+
+Creating a `github_repository_collaborator` can leave a pending invitation. Until
+the bot accepts it, GitHub may let it post a review as a public reader without
+counting that review toward branch protection. After the four public adapter
+repositories have been applied, run the metadata-only workflow from `main`:
+
+```sh
+gh workflow run accept-adapter-reviewer.yml --ref main
+```
+
+The existing `BOT_PAT` must belong to `californiantiramisu`. The workflow accepts
+only that user's write invitations for the four repositories in
+`local.public_adapters`. It does not create permissions, accept other invitations,
+check out source, approve PRs, or bypass protections. Re-running is safe: already
+accepted invitations are no longer returned. Verify the bot has `write`
+permission, then rerun each repository's normal review workflow if necessary.
 
 ## Validation
 

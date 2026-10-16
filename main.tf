@@ -1,5 +1,12 @@
 locals {
   repositories = {
+    zac93-esp32 = {
+      description            = "Illustrated Zooz ZAC93 Z-Wave bridge guide for ESP32-WROOM and ESP32-S3, ESPHome, Z-Wave JS and Home Assistant"
+      visibility             = "public"
+      has_issues             = true
+      enable_secret_scanning = true
+      topics                 = ["zac93", "z-wave", "esphome", "esp32", "esp32-s3", "home-assistant", "zwave-js", "diy"]
+    }
     ha-lg-tv-capture = {
       description            = "LG webOS TV screen capture for Home Assistant: reusable capture tooling and integrations"
       visibility             = "public"
@@ -95,6 +102,45 @@ locals {
       topics      = ["home-assistant", "homelab", "github-profile"]
     }
   }
+}
+
+# Block publication to the new guide's default branch unless both source and
+# secret checks pass. No administrator bypass or extra human approval gate.
+resource "github_repository_ruleset" "zac93_publication" {
+  name        = "Protect main"
+  repository  = github_repository.repositories["zac93-esp32"].name
+  target      = "branch"
+  enforcement = "active"
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 0
+      required_review_thread_resolution = true
+    }
+    required_status_checks {
+      strict_required_status_checks_policy = true
+      required_check {
+        context        = "check"
+        integration_id = 15368
+      }
+      required_check {
+        context        = "secrets"
+        integration_id = 15368
+      }
+    }
+  }
+
+  depends_on = [github_branch_default.main["zac93-esp32"]]
 }
 
 # Public conversion tooling follows the existing public-repository policy.

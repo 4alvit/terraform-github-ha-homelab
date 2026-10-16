@@ -5,9 +5,11 @@ temporary=$(mktemp -d "${TMPDIR:-/tmp}/public-security-test.XXXXXX")
 trap 'rm -rf "$temporary"' EXIT
 mkdir -p "$temporary/tests" "$temporary/provider-cache"
 touch "$temporary/empty.tfrc"
-cp main.tf public-security.tf home-assistant-public.tf desloc-coderabbit.tf lg-tv-capture.tf echomuse.tf tests/public-security-main.tf.fixture "$temporary/"
+cp main.tf public-security.tf home-assistant-public.tf home-studio.tf desloc-coderabbit.tf lg-tv-capture.tf echomuse.tf public-adapters.tf tests/public-security-main.tf.fixture "$temporary/"
 mv "$temporary/public-security-main.tf.fixture" "$temporary/test-providers.tf"
 cp tests/public-security.tftest.hcl "$temporary/tests/"
+cp tests/public-adapters.tftest.hcl "$temporary/tests/"
+cp tests/home-studio.tftest.hcl "$temporary/tests/"
 if [[ -f .terraform.lock.hcl ]]; then
   cp .terraform.lock.hcl "$temporary/"
 fi
