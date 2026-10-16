@@ -62,3 +62,11 @@ source and application of a state-aware infrastructure plan.
 The `.bestpractices.json` file records evidence for an OpenSSF Best Practices
 self-assessment. Unknown and unmet fields remain visible; the file is not an
 awarded badge or an independent security certification.
+
+## Participation and assessment
+
+Follow [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), [governance](GOVERNANCE.md), and [the one-year roadmap](ROADMAP.md). Contributions must be your own work or submitted with the rights needed under the MIT license. The primary maintainer follows the same test and review policy as other contributors. Keep the README OpenSSF badge and evidence accurate within 48 hours of a status change.
+
+For cryptographic assurance use the complete [supported local-execution profile](docs/TLS_PROFILE.md); successful ordinary HTTPS requests alone do not establish exact minimum key sizes.
+
+The [OpenTofu 1.13.1 source-validation profile](docs/OPENTOFU.md) runs the same source and policy checks using FLOSS tools without changing the production backend or state.

@@ -20,8 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Terraform configs have no compiled language; analyze the Actions workflows
-        language: ["actions"]
+        # Analyze Actions and the maintained Python TLS test helper.
+        language: ["actions", "python"]
 
     steps:
       - name: Harden the runner (Audit all outbound calls)

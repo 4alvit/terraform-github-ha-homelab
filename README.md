@@ -282,3 +282,9 @@ Apply a reviewed HCP plan scoped to the four new repository identities, default
 branches, vulnerability/security update settings and rulesets, plus only the
 ZAC93 repository wiki flag. Do not include unrelated workspace drift. Inspect
 the planned resource addresses before applying, then verify a fresh scoped plan.
+
+## Maintenance and verified operation
+
+See the [supported TLS profile](docs/TLS_PROFILE.md), [assessment evidence](docs/openssf-evidence.md), [governance](GOVERNANCE.md), [Code of Conduct](CODE_OF_CONDUCT.md), and [one-year roadmap](ROADMAP.md).
+
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15575/badge)](https://www.bestpractices.dev/projects/15575)
