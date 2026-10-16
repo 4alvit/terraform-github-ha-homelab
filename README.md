@@ -245,8 +245,8 @@ for this infrastructure repository separately from the projects it manages.
 
 ## EchoMuse documentation wiki
 
-The `ha-echomuse` entry explicitly enables its public GitHub wiki. Other
-repositories retain the default `has_wiki = false`; enabling documentation here
+The `ha-echomuse` entry explicitly enables its public GitHub wiki. Entries without
+an explicit opt-in retain `has_wiki = false`; enabling documentation here
 changes neither repository visibility nor branch/review protection.
 
 The source documentation and reproducible wiki exporter live in
@@ -259,3 +259,26 @@ For this narrowly scoped change, inspect a remote plan targeted to
 `github_repository.repositories["ha-echomuse"]`. Apply only if the planned
 resource change is the wiki flag. Do not apply unrelated organization drift as
 part of documentation publication.
+
+## Public community tools and illustrated documentation
+
+Four independent offline tools are managed in `community-tools.tf`:
+[entity migration plans](https://github.com/ha-homelab/ha-entity-migrations),
+[meter contracts](https://github.com/ha-homelab/ha-meter-contracts),
+[Home Assistant scenarios](https://github.com/ha-homelab/ha-scenario-tests), and
+[Assist evidence evaluation](https://github.com/ha-homelab/assist-scenario-lab).
+Their READMEs and CLI support English, Russian, German and Spanish. Detailed
+EN/RU guides and separately published GitHub wikis use synthetic examples.
+The [community overview](https://github.com/ha-homelab/.github/tree/main/community-tools)
+explains how the tools relate and records the remaining hardware work.
+
+These repositories require signed commits and pull requests with successful
+`check` and `secrets` checks; there are no bypass actors. Secret scanning and
+push protection are enabled. The initial repositories are adopted through
+explicit import blocks; do not create duplicate state ownership. ZAC93 also
+opts into its documentation wiki without changing radio or firmware settings.
+
+Apply a reviewed HCP plan scoped to the four new repository identities, default
+branches, vulnerability/security update settings and rulesets, plus only the
+ZAC93 repository wiki flag. Do not include unrelated workspace drift. Inspect
+the planned resource addresses before applying, then verify a fresh scoped plan.
