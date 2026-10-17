@@ -9,6 +9,12 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Public project ownership
 
+- `ha-homelab/asterisk-telephony` — reusable Home Assistant/Asterisk companion
+  with AMI event bridging, phone entities, call actions and deployment guidance.
+  Household topology, SIP/AMI credentials and Cisco firmware remain outside the
+  public repository. Its bootstrap grants no bot access or runner infrastructure;
+  see [the scoped provisioning procedure](docs/asterisk-telephony-provisioning.md).
+
 - `ha-homelab/ha-radio-hub` — modular single-input PoE radio appliance,
   ESPHome firmware, local OTBR deployment, original wiring and printable CAD.
   Existing RF credentials, learned codes and network backups remain private.
