@@ -43,5 +43,5 @@ resource "github_repository_ruleset" "radio_hub" {
       error_message = "Publish the main-branch check workflow before activating radio-hub protection."
     }
   }
-  depends_on = [github_branch_default.main]
+  depends_on = [github_branch_default.main["ha-radio-hub"]]
 }
