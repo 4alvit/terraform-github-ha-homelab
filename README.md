@@ -9,6 +9,10 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Public project ownership
 
+- `ha-homelab/ha-radio-hub` — modular single-input PoE radio appliance,
+  ESPHome firmware, local OTBR deployment, original wiring and printable CAD.
+  Existing RF credentials, learned codes and network backups remain private.
+
 The reusable adapters in `public-adapters.tf` start with fresh public history:
 
 - `ha-onvif-room-direction` — read-only camera direction mapped to configured areas.
