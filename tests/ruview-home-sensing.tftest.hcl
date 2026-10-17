@@ -11,8 +11,9 @@ mock_provider "github" {
 run "public_ruview_requires_hosted_ci_and_independent_review" {
   command = plan
   override_resource {
-    target          = github_repository.ruview_home_sensing
     override_during = plan
+
+    target = github_repository.ruview_home_sensing
     values = {
       repo_id = 424242
     }
