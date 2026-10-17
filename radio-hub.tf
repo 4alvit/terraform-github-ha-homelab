@@ -1,14 +1,16 @@
 # Public original source only; firmware credentials and household data stay local.
 # Apply after the initial source commit so required checks can run.
 data "github_repository_file" "radio_hub_check" {
-  repository = github_repository.repositories["ha-radio-hub"].name
+  # Deliberate staged bootstrap: this lookup must succeed after source publication.
+  # Avoid depending on the whole for_each repository catalog for policy rollout.
+  repository = "ha-radio-hub"
   branch     = "main"
   file       = ".github/workflows/check.yml"
 }
 
 resource "github_repository_ruleset" "radio_hub" {
   name        = "Protect main"
-  repository  = github_repository.repositories["ha-radio-hub"].name
+  repository  = data.github_repository_file.radio_hub_check.repository
   target      = "branch"
   enforcement = "active"
 
@@ -43,5 +45,4 @@ resource "github_repository_ruleset" "radio_hub" {
       error_message = "Publish the main-branch check workflow before activating radio-hub protection."
     }
   }
-  depends_on = [github_branch_default.main["ha-radio-hub"]]
 }
