@@ -4,7 +4,7 @@ resource "github_repository" "ruview_home_sensing" {
   name                   = "ruview-home-sensing"
   description            = "Reusable Wi-Fi sensing, evidence validation, receiver firmware and Home Assistant integration tools"
   visibility             = "public"
-  auto_init              = true
+  auto_init              = false
   has_issues             = true
   has_projects           = false
   has_wiki               = false
@@ -93,5 +93,25 @@ resource "github_repository_ruleset" "ruview_home_sensing" {
         integration_id = 15368
       }
     }
+  }
+}
+
+# A consumed release must never silently move to different source bytes.
+resource "github_repository_ruleset" "ruview_home_sensing_tags" {
+  name        = "Release standard - immutable version tags"
+  repository  = github_repository.ruview_home_sensing.name
+  target      = "tag"
+  enforcement = "active"
+
+  conditions {
+    ref_name {
+      include = ["refs/tags/v*"]
+      exclude = []
+    }
+  }
+
+  rules {
+    update   = true
+    deletion = true
   }
 }

@@ -13,7 +13,8 @@ run "public_ruview_requires_hosted_ci_and_independent_review" {
   assert {
     condition = (
       github_repository.ruview_home_sensing.visibility == "public" &&
-      github_repository.ruview_home_sensing.auto_init &&
+      !github_repository.ruview_home_sensing.auto_init &&
+      github_repository.ruview_home_sensing.archive_on_destroy &&
       !github_repository.ruview_home_sensing.allow_auto_merge &&
       one(one(github_repository.ruview_home_sensing.security_and_analysis).secret_scanning).status == "enabled" &&
       one(one(github_repository.ruview_home_sensing.security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
@@ -22,6 +23,10 @@ run "public_ruview_requires_hosted_ci_and_independent_review" {
       github_workflow_repository_permissions.ruview_home_sensing.default_workflow_permissions == "read" &&
       !github_workflow_repository_permissions.ruview_home_sensing.can_approve_pull_request_reviews &&
       github_repository_ruleset.ruview_home_sensing.enforcement == "active" &&
+      github_repository_ruleset.ruview_home_sensing_tags.enforcement == "active" &&
+      one(github_repository_ruleset.ruview_home_sensing_tags.rules).update &&
+      one(github_repository_ruleset.ruview_home_sensing_tags.rules).deletion &&
+      length(github_repository_ruleset.ruview_home_sensing_tags.bypass_actors) == 0 &&
       length(github_repository_ruleset.ruview_home_sensing.bypass_actors) == 0 &&
       one(one(github_repository_ruleset.ruview_home_sensing.rules).pull_request).required_approving_review_count == 1 &&
       one(one(github_repository_ruleset.ruview_home_sensing.rules).pull_request).require_last_push_approval &&
