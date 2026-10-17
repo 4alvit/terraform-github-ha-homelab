@@ -2,8 +2,8 @@
 # SIP credentials, firmware, collaborator grants or runner infrastructure lives here.
 resource "github_repository" "asterisk_telephony" {
   name                        = "asterisk-telephony"
-  description                 = "Home Assistant integration for local Asterisk telephony: AMI event bridge, phone entities, call actions and documented deployment"
-  topics                      = ["home-assistant", "asterisk", "telephony", "sip", "mqtt", "python"]
+  description                 = "Home Assistant integration for Asterisk: verified installer, phone dashboards, call actions, Assist and deployment documentation"
+  topics                      = ["home-assistant", "asterisk", "telephony", "sip", "k3s", "python"]
   visibility                  = "public"
   auto_init                   = true
   has_issues                  = true
