@@ -30,8 +30,10 @@ run "public_ruview_requires_hosted_ci_and_independent_review" {
       length(github_repository_ruleset.ruview_home_sensing.bypass_actors) == 0 &&
       one(one(github_repository_ruleset.ruview_home_sensing.rules).pull_request).required_approving_review_count == 1 &&
       one(one(github_repository_ruleset.ruview_home_sensing.rules).pull_request).require_last_push_approval &&
-      toset([for check in one(one(github_repository_ruleset.ruview_home_sensing.rules).required_status_checks).required_check : check.context]) == toset(["Public CI gate"]) &&
-      alltrue([for check in one(one(github_repository_ruleset.ruview_home_sensing.rules).required_status_checks).required_check : check.integration_id == 15368])
+      { for check in one(one(github_repository_ruleset.ruview_home_sensing.rules).required_status_checks).required_check : check.context => check.integration_id } == {
+        "Public CI gate" = 15368
+        "CodeQL"         = 57789
+      }
     )
     error_message = "The public RuView implementation must use GitHub-hosted CI, secret protection, a read-only token and independent approval without bypasses."
   }

@@ -92,6 +92,11 @@ resource "github_repository_ruleset" "ruview_home_sensing" {
         context        = "Public CI gate"
         integration_id = 15368
       }
+      # A successful SARIF upload does not mean its security findings passed.
+      required_check {
+        context        = "CodeQL"
+        integration_id = 57789
+      }
     }
   }
 }
