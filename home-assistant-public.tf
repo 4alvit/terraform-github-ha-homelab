@@ -86,12 +86,18 @@ resource "github_repository_ruleset" "home_assistant_public" {
     }
     required_status_checks {
       strict_required_status_checks_policy = true
+      # Reusable workflows publish qualified job names; the shared gate also
+      # covers workflow and release contracts beyond these two validation jobs.
       required_check {
-        context        = "validate"
+        context        = "CI gate"
         integration_id = 15368
       }
       required_check {
-        context        = "maintenance-runtime"
+        context        = "check-0 / validate"
+        integration_id = 15368
+      }
+      required_check {
+        context        = "check-0 / maintenance-runtime"
         integration_id = 15368
       }
     }
