@@ -348,7 +348,7 @@ resource "github_repository_ruleset" "profile" {
   }
 }
 
-# Public integration source follows the same PR and history protection pattern.
+# Public integration source requires current review and the shared CI gate.
 resource "github_repository_ruleset" "desloc" {
   name        = "Protect main"
   repository  = github_repository.repositories["ha-desloc"].name
@@ -380,6 +380,16 @@ resource "github_repository_ruleset" "desloc" {
       allowed_merge_methods             = ["squash"]
       required_approving_review_count   = contains(local.review_required_public_software_repositories, "ha-desloc") ? 1 : 0
       required_review_thread_resolution = true
+    }
+    dynamic "required_status_checks" {
+      for_each = contains(local.active_public_software_repositories, "ha-desloc") ? [true] : []
+      content {
+        strict_required_status_checks_policy = true
+        required_check {
+          context        = "CI gate"
+          integration_id = 15368
+        }
+      }
     }
   }
 }

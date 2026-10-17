@@ -1,5 +1,5 @@
 variable "public_security_enforcement_repositories" {
-  description = "Public repositories whose approval automation has been verified and whose stricter review policy is explicitly activated. Existing administrator bypasses remain until activation."
+  description = "Additional public repositories whose approval automation has been verified and whose stricter review policy is explicitly activated. DESLOC is mandatory; existing administrator bypasses remain on other repositories until activation."
   type        = set(string)
   default     = []
 
@@ -38,8 +38,15 @@ locals {
 }
 
 locals {
+  # DESLOC's review and CI requirements are established policy, not an optional
+  # workspace setting. The live public/active guard still applies below.
+  mandatory_review_public_software_repositories = toset(["ha-desloc"])
+
   review_required_public_software_repositories = setintersection(
     local.active_public_software_repositories,
-    var.public_security_enforcement_repositories,
+    setunion(
+      local.mandatory_review_public_software_repositories,
+      var.public_security_enforcement_repositories,
+    ),
   )
 }
