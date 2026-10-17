@@ -304,3 +304,13 @@ See the [supported TLS profile](docs/TLS_PROFILE.md), [assessment evidence](docs
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15575/badge)](https://www.bestpractices.dev/projects/15575)
 
 The [disclosed secure-provider profile](docs/SECURE_PROVIDER.md) builds a reviewed patched GitHub provider, validates an isolated source copy and supports a guarded independent local deployment with OpenTofu; production locks and state are not automatically changed. The [engine advisory assessment](docs/OPENTOFU_ADVISORIES.md) is dated and scoped.
+
+## Public RuView implementation
+
+`ruview-home-sensing.tf` creates [ha-homelab/ruview-home-sensing](https://github.com/ha-homelab/ruview-home-sensing) as an independent public repository. Publication uses reviewed generic source and a new Git history; no existing repository changes visibility. Installation configuration, device identities, credentials, observations and floor plans are excluded from this repository.
+
+The initial repository has secret scanning and push protection, vulnerability alerts, Dependabot security updates, read-only default workflow permissions, and no workflow permission to approve pull requests. `CI_RUNNER_MODE=github` overrides organization routing so shared workflows use GitHub-hosted runners. The project also checks that policy before launching its shared validation. Main requires one current independent approval, resolved review threads, and the `Public CI gate` check, with no bypass actors. Automatic merging remains disabled.
+
+Provisioning is a reviewed targeted HCP plan containing only the seven `ruview_home_sensing` resources (the runner variable is `ruview_home_sensing_hosted`). Check for unexpected addresses or non-create actions before the first apply. Existing organization repositories are outside this bootstrap scope. Repository files and application releases remain owned by their source PRs.
+
+Private vulnerability reporting is enabled through GitHub's repository API. Provider 6.13.0 does not expose this setting, so it is a documented external setting rather than a Terraform-managed attribute. Verify `GET /repos/ha-homelab/ruview-home-sensing/private-vulnerability-reporting` returns `enabled: true` after repository recovery.
