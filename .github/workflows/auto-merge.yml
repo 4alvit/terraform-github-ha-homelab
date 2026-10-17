@@ -32,7 +32,7 @@ jobs:
     # This reusable job reads GitHub metadata only and never executes PR source.
     uses: victron-venus/venus-os-ci-toolkit/.github/workflows/auto-merge.yml@21a366f200f0371a10a6de7ad6ca263af230b842
     with:
-      pr-author: 4alvit,californiantiramisu
+      pr-author: 4alvit
       merge-method: squash
       reviewed-merge: true
       reviewed-single-pass: true
