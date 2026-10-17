@@ -119,9 +119,51 @@ run "existing_public_rules_require_one_current_review" {
   }
 }
 
+run "desloc_requires_current_review_and_ci_by_default" {
+  command = plan
+  assert {
+    condition = (
+      github_repository_ruleset.desloc.enforcement == "active" &&
+      toset(one(one(github_repository_ruleset.desloc.conditions).ref_name).include) == toset(["~DEFAULT_BRANCH"]) &&
+      length(one(one(github_repository_ruleset.desloc.conditions).ref_name).exclude) == 0 &&
+      length(github_repository_ruleset.desloc.bypass_actors) == 0 &&
+      one(github_repository_ruleset.desloc.rules).deletion &&
+      one(github_repository_ruleset.desloc.rules).non_fast_forward &&
+      one(one(github_repository_ruleset.desloc.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.desloc.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.desloc.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.desloc.rules).pull_request).required_review_thread_resolution &&
+      one(one(github_repository_ruleset.desloc.rules).required_status_checks).strict_required_status_checks_policy &&
+      length(one(one(github_repository_ruleset.desloc.rules).required_status_checks).required_check) == 1 &&
+      alltrue([
+        for check in one(one(github_repository_ruleset.desloc.rules).required_status_checks).required_check :
+        check.context == "CI gate" && check.integration_id == 15368
+      ])
+    )
+    error_message = "DESLOC must always require one current approval and the strict GitHub Actions CI gate, with no bypass."
+  }
+}
+
+run "empty_optional_activation_cannot_disable_desloc_policy" {
+  command = plan
+  variables {
+    public_security_enforcement_repositories = []
+  }
+  assert {
+    condition = (
+      local.review_required_public_software_repositories == toset(["ha-desloc"]) &&
+      length(github_repository_ruleset.desloc.bypass_actors) == 0 &&
+      one(one(github_repository_ruleset.desloc.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.desloc.rules).required_status_checks).strict_required_status_checks_policy &&
+      toset([for check in one(one(github_repository_ruleset.desloc.rules).required_status_checks).required_check : check.context]) == toset(["CI gate"])
+    )
+    error_message = "An explicit empty optional activation list must not remove mandatory DESLOC review or CI."
+  }
+}
+
 run "private_repository_preserves_existing_policy" {
   variables {
-    public_security_enforcement_repositories = ["ha-desloc"]
+    public_security_enforcement_repositories = []
   }
   command         = plan
   expect_failures = [github_repository_collaborator.desloc_coderabbit["ha-desloc"]]
@@ -139,6 +181,7 @@ run "private_repository_preserves_existing_policy" {
       one(one(github_repository_ruleset.desloc.rules).pull_request).required_approving_review_count == 0 &&
       !one(one(github_repository_ruleset.desloc.rules).pull_request).require_last_push_approval &&
       !one(one(github_repository_ruleset.desloc.rules).pull_request).dismiss_stale_reviews_on_push &&
+      length(one(github_repository_ruleset.desloc.rules).required_status_checks) == 0 &&
       length(github_repository.repositories["ha-desloc"].security_and_analysis) == 0
     )
     error_message = "An excluded repository must retain its existing policy and receive no public security settings."
@@ -147,7 +190,7 @@ run "private_repository_preserves_existing_policy" {
 
 run "archived_repository_preserves_existing_policy" {
   variables {
-    public_security_enforcement_repositories = ["ha-desloc"]
+    public_security_enforcement_repositories = []
   }
   command         = plan
   expect_failures = [github_repository_collaborator.desloc_coderabbit["ha-desloc"]]
@@ -165,6 +208,7 @@ run "archived_repository_preserves_existing_policy" {
       one(one(github_repository_ruleset.desloc.rules).pull_request).required_approving_review_count == 0 &&
       !one(one(github_repository_ruleset.desloc.rules).pull_request).require_last_push_approval &&
       !one(one(github_repository_ruleset.desloc.rules).pull_request).dismiss_stale_reviews_on_push &&
+      length(one(github_repository_ruleset.desloc.rules).required_status_checks) == 0 &&
       length(github_repository.repositories["ha-desloc"].security_and_analysis) == 0
     )
     error_message = "An excluded repository must retain its existing policy and receive no public security settings."
@@ -352,7 +396,6 @@ run "unactivated_public_reviews_preserve_existing_bypasses" {
   assert {
     condition = alltrue([
       for policy in [
-        github_repository_ruleset.desloc,
         github_repository_ruleset.desloc_card,
         github_repository_ruleset.echo_dot,
         github_repository_ruleset.echo_show_5,
@@ -365,7 +408,7 @@ run "unactivated_public_reviews_preserve_existing_bypasses" {
         !one(one(policy.rules).pull_request).dismiss_stale_reviews_on_push
       )
     ])
-    error_message = "Existing reviews and bypasses must remain until explicitly activated."
+    error_message = "Other repositories' reviews and bypasses must remain until explicitly activated."
   }
 }
 

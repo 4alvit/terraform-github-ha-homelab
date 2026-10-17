@@ -2,11 +2,19 @@
 
 `public-security.tf` lists the public repositories reviewed for this rollout.
 Live metadata excludes private and archived repositories from new protections.
-The six audited public repositories preserve their current administrator bypass
-and review settings by default. Set `public_security_enforcement_repositories` only
-for repositories whose approval automation has been verified; activation requires
-one current approval, dismisses stale approvals, resolves review threads, and
-removes administrator bypasses. Live visibility and archive checks still apply.
+The public `ha-desloc` integration always requires one current approval, dismisses
+stale approvals, requires approval after the last push, resolves review threads,
+and has no bypass actors. Its existing `Protect main` ruleset also requires the
+strict `CI gate` check bound to GitHub Actions (integration ID `15368`). The gate
+is supplied by the integration's existing shared CI workflow. An empty
+`public_security_enforcement_repositories` value cannot disable this policy.
+Live visibility and archive checks still apply.
+
+The other five audited public repositories preserve their current administrator
+bypass and review settings by default. Set
+`public_security_enforcement_repositories` only for repositories whose approval
+automation has been verified; activation enables the same current-review policy
+without administrator bypasses.
 This explicit activation does not affect the already active one-review policies
 for the button, Tuya conversion, and public Home Assistant repositories.
 Existing mandatory status checks and enabled auto-merge settings are preserved.
@@ -35,6 +43,13 @@ fleet-wide apply from an empty or unrelated state. If a rule was created through
 the API, import its actual repository/ruleset identity at the declared address
 before applying; do not create a duplicate rule. For out-of-band setting changes,
 refresh and inspect the plan to verify the source preserves them.
+
+For the DESLOC policy repair, retain the existing resource address
+`github_repository_ruleset.desloc` and remote ruleset ID `24293264`. Review a
+targeted plan for that resource in the canonical HCP workspace, then verify the
+live default-branch rules and required check identity after applying. A full plan
+must still be inspected for unrelated drift; do not apply other repositories'
+changes as part of this repair. The separate card repository is outside its scope.
 
 One current approval from a reviewer with Write access satisfies the review
 count. Automation may provide that approval; it does not replace the required CI
