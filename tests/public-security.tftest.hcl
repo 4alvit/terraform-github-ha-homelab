@@ -13,6 +13,7 @@ run "zac93_requires_source_and_secret_checks_without_bypass" {
   assert {
     condition = (
       github_repository.repositories["zac93-esp32"].visibility == "public" &&
+      github_repository.repositories["zac93-esp32"].allow_auto_merge &&
       one(one(github_repository.repositories["zac93-esp32"].security_and_analysis).secret_scanning).status == "enabled" &&
       one(one(github_repository.repositories["zac93-esp32"].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
       github_repository_ruleset.zac93_publication.enforcement == "active" &&
@@ -22,7 +23,7 @@ run "zac93_requires_source_and_secret_checks_without_bypass" {
       one(one(github_repository_ruleset.zac93_publication.rules).required_status_checks).strict_required_status_checks_policy &&
       toset([for check in one(one(github_repository_ruleset.zac93_publication.rules).required_status_checks).required_check : check.context]) == toset(["check", "secrets"])
     )
-    error_message = "The ZAC93 guide must protect secrets and require both publication checks without a bypass."
+    error_message = "The ZAC93 guide must retain auto-merge while protecting secrets and requiring both publication checks without a bypass."
   }
 }
 
@@ -385,9 +386,16 @@ run "public_home_assistant_protects_reviewed_main" {
       one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).required_approving_review_count == 1 &&
       one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).dismiss_stale_reviews_on_push &&
       one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).require_last_push_approval &&
-      toset([for check in one(one(github_repository_ruleset.home_assistant_public.rules).required_status_checks).required_check : check.context]) == toset(["validate", "maintenance-runtime"])
+      one(one(github_repository_ruleset.home_assistant_public.rules).pull_request).required_review_thread_resolution &&
+      one(one(github_repository_ruleset.home_assistant_public.rules).required_status_checks).strict_required_status_checks_policy &&
+      toset([for check in one(one(github_repository_ruleset.home_assistant_public.rules).required_status_checks).required_check : check.context]) == toset(["CI gate", "check-0 / validate", "check-0 / maintenance-runtime"]) &&
+      length(one(one(github_repository_ruleset.home_assistant_public.rules).required_status_checks).required_check) == 3 &&
+      alltrue([
+        for check in one(one(github_repository_ruleset.home_assistant_public.rules).required_status_checks).required_check :
+        check.integration_id == 15368
+      ])
     )
-    error_message = "Public Home Assistant main must require current reviews and both CI checks, without a bypass."
+    error_message = "Public Home Assistant main must require current reviews, resolved threads, and all three strict GitHub Actions checks under their reusable-workflow names, without a bypass."
   }
 }
 

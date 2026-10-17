@@ -19,6 +19,20 @@ This explicit activation does not affect the already active one-review policies
 for the button, Tuya conversion, and public Home Assistant repositories.
 Existing mandatory status checks and enabled auto-merge settings are preserved.
 
+The public Home Assistant repository requires `CI gate`, `check-0 / validate`,
+and `check-0 / maintenance-runtime`, all bound to GitHub Actions (integration
+ID `15368`) with strict up-to-date checks. The `check-0 /` prefix is part of the
+published check name from the reusable workflow. Keep these exact names in
+Terraform when reconciling the shared pipeline; the old unqualified names do
+not describe the checks that current pull requests produce. The existing
+one-review policy, stale approval dismissal, latest-push approval, resolved
+threads, and absence of bypass actors remain required.
+
+`zac93-esp32` retains its enabled auto-merge setting. Auto-merge still waits for
+the repository's strict `check` and `secrets` checks, and adds no ruleset bypass.
+Policy tests cover these established settings so a later apply cannot silently
+disable auto-merge or replace active checks with obsolete names.
+
 Secret scanning and push protection are enabled on the audited public repository
 resources managed by this state. Private vulnerability reporting was enabled
 separately through GitHub's repository API; the pinned Terraform provider does

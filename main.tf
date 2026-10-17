@@ -49,6 +49,7 @@ locals {
       visibility             = "public"
       has_issues             = true
       enable_secret_scanning = true
+      allow_auto_merge       = true
       topics                 = ["zac93", "z-wave", "esphome", "esp32", "esp32-s3", "home-assistant", "zwave-js", "diy"]
     }
     ha-lg-tv-capture = {
