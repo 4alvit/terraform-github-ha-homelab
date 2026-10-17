@@ -1,0 +1,41 @@
+name: Reviewed Auto Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+  workflow_run:
+    workflows: [Terraform CI, CodeQL, Dependency Review, Auto Approve PRs]
+    types: [completed]
+  status:
+  check_run:
+    types: [completed]
+  check_suite:
+    types: [completed]
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: read
+  actions: read
+
+concurrency:
+  group: metadata-reviewed-merge
+  cancel-in-progress: false
+
+jobs:
+  auto-merge:
+    # This reusable job reads GitHub metadata only and never executes PR source.
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/auto-merge.yml@21a366f200f0371a10a6de7ad6ca263af230b842
+    with:
+      pr-author: 4alvit,californiantiramisu
+      merge-method: squash
+      reviewed-merge: true
+      reviewed-single-pass: true
+      required-status-checks: Terraform validation,CodeQL
+    secrets:
+      BOT_PAT: ${{ secrets.BOT_PAT }}

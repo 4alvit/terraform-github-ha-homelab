@@ -12,7 +12,7 @@ resource "github_repository" "ruview_home_sensing" {
   allow_merge_commit     = false
   allow_squash_merge     = true
   allow_rebase_merge     = false
-  allow_auto_merge       = false
+  allow_auto_merge       = true
   delete_branch_on_merge = true
   archive_on_destroy     = true
   topics                 = ["esp32", "home-assistant", "ruview", "wifi-sensing"]
@@ -42,7 +42,34 @@ resource "github_branch_default" "ruview_home_sensing" {
 resource "github_workflow_repository_permissions" "ruview_home_sensing" {
   repository                       = github_repository.ruview_home_sensing.name
   default_workflow_permissions     = "read"
-  can_approve_pull_request_reviews = false
+  can_approve_pull_request_reviews = true
+}
+
+# Metadata-only shared workflows use this independent reviewer; no bypass or
+# administrator role is granted and no credential value is managed here.
+resource "github_repository_collaborator" "ruview_home_sensing_bot" {
+  repository = github_repository.ruview_home_sensing.name
+  username   = "californiantiramisu"
+  permission = "push"
+}
+
+resource "github_actions_organization_secret_repository" "ruview_home_sensing_bot" {
+  secret_name   = "BOT_PAT"
+  repository_id = github_repository.ruview_home_sensing.repo_id
+}
+
+resource "github_issue_label" "ruview_home_sensing_automerge" {
+  repository  = github_repository.ruview_home_sensing.name
+  name        = "automerge"
+  color       = "0e8a16"
+  description = "Merge only after current-head approval and all required validation"
+}
+
+resource "github_issue_label" "ruview_home_sensing_autoapprove" {
+  repository  = github_repository.ruview_home_sensing.name
+  name        = "auto-approve"
+  color       = "2da44e"
+  description = "Request the shared independent-reviewer approval policy"
 }
 
 # Explicitly override any organization-wide emergency runner routing. Public
