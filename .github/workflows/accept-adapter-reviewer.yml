@@ -33,6 +33,7 @@ jobs:
               "ha-homelab/ruview-home-assistant",
               "ha-homelab/ha-access-session",
               "ha-homelab/sensing-evidence-kit",
+              "ha-homelab/ruview-home-sensing",
           }
 
           def api(path, method="GET", paginate=False):

@@ -219,8 +219,7 @@ and verify the live public visibility and protections.
 
 Creating a `github_repository_collaborator` can leave a pending invitation. Until
 the bot accepts it, GitHub may let it post a review as a public reader without
-counting that review toward branch protection. After the four public adapter
-repositories have been applied, run the metadata-only workflow from `main`:
+counting that review toward branch protection. After the public adapter or RuView reviewer resources have been applied, run the metadata-only workflow from `main`:
 
 ```sh
 gh workflow run accept-adapter-reviewer.yml --ref main
@@ -228,7 +227,7 @@ gh workflow run accept-adapter-reviewer.yml --ref main
 
 The existing `BOT_PAT` must belong to `californiantiramisu`. The workflow accepts
 only that user's write invitations for the four repositories in
-`local.public_adapters`. It does not create permissions, accept other invitations,
+`local.public_adapters` and `ha-homelab/ruview-home-sensing`. It does not create permissions, accept other invitations,
 check out source, approve PRs, or bypass protections. Re-running is safe: already
 accepted invitations are no longer returned. Verify the bot has `write`
 permission, then rerun each repository's normal review workflow if necessary.
@@ -304,3 +303,21 @@ See the [supported TLS profile](docs/TLS_PROFILE.md), [assessment evidence](docs
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15575/badge)](https://www.bestpractices.dev/projects/15575)
 
 The [disclosed secure-provider profile](docs/SECURE_PROVIDER.md) builds a reviewed patched GitHub provider, validates an isolated source copy and supports a guarded independent local deployment with OpenTofu; production locks and state are not automatically changed. The [engine advisory assessment](docs/OPENTOFU_ADVISORIES.md) is dated and scoped.
+
+## Public RuView implementation
+
+`ruview-home-sensing.tf` creates [ha-homelab/ruview-home-sensing](https://github.com/ha-homelab/ruview-home-sensing) as an independent public repository. Publication uses reviewed generic source and a new Git history; no existing repository changes visibility. Installation configuration, device identities, credentials, observations and floor plans are excluded from this repository.
+
+The initial repository has secret scanning and push protection, vulnerability alerts, Dependabot security updates, read-only default workflow permissions, and approval support for explicitly authorized metadata workflows. `CI_RUNNER_MODE=github` overrides organization routing so shared workflows use GitHub-hosted runners. The project also checks that policy before launching its shared validation. Main requires one current independent approval, resolved review threads, the `Public CI gate` check from GitHub Actions, and the separate `CodeQL` result from GitHub Advanced Security, with no bypass actors. A successful SARIF upload does not bypass security findings. Automatic merging is enabled, but both validation checks and current independent approval remain mandatory. Version tags matching `v*` cannot be updated or deleted; new release tags remain permitted.
+
+Provisioning is a reviewed targeted HCP plan containing only the twelve RuView resources (the runner variable is `ruview_home_sensing_hosted` and the version-tag ruleset is `ruview_home_sensing_tags`). Check for unexpected addresses or non-create actions before the first apply. Existing organization repositories are outside this bootstrap scope. Repository files and application releases remain owned by their source PRs.
+
+Private vulnerability reporting is enabled through GitHub's repository API. Provider 6.13.0 does not expose this setting, so it is a documented external setting rather than a Terraform-managed attribute. Verify `GET /repos/ha-homelab/ruview-home-sensing/private-vulnerability-reporting` returns `enabled: true` after repository recovery.
+
+The repository must be created with `auto_init=false`. A generated GitHub README commit can use account author metadata rather than an explicit public identity. Bootstrap an empty repository with a reviewed root commit whose author and committer both use the intended public login and GitHub noreply address. Apply the repository shell and its security/workflow settings first, push the clean root commit, and then apply the default branch and ruleset. The initial empty bootstrap was recreated before publishing application source to enforce this boundary; no prior application history was transferred.
+
+### Reviewed approval and merge automation
+
+The existing organization `BOT_PAT` is granted only to the public RuView repository, and `californiantiramisu` receives Write access without administration or rule bypass. Terraform manages only that secret allowlist membership, never the credential value. The `auto-approve` and `automerge` labels express separate approval and merge requests. Accept the scoped reviewer invitation before expecting its approval to satisfy protection.
+
+This infrastructure repository uses metadata-only reusable approval and reviewed single-pass merge workflows pinned to `victron-venus/venus-os-ci-toolkit` commit `21a366f200f0371a10a6de7ad6ca263af230b842`. For same-repository branches authored by the maintainer with verified public no-reply identity, add `auto-approve` to request the existing independent bot review, and `automerge` to request squash merge after all reported checks succeed, including `Terraform validation` and `CodeQL`. The merge evaluator verifies the exact head, current default branch and approval repeatedly; it does not use native auto-merge or bypass protection. Completion events and a recovery schedule re-evaluate waiting requests. These jobs never check out or execute pull-request code. Bot-authored PRs require an explicit public no-reply author identity at manual squash merge until that account's merge identity is verified; the reviewer remains `californiantiramisu`.
