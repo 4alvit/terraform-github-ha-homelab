@@ -321,3 +321,12 @@ The repository must be created with `auto_init=false`. A generated GitHub README
 The existing organization `BOT_PAT` is granted only to the public RuView repository, and `californiantiramisu` receives Write access without administration or rule bypass. Terraform manages only that secret allowlist membership, never the credential value. The `auto-approve` and `automerge` labels express separate approval and merge requests. Accept the scoped reviewer invitation before expecting its approval to satisfy protection.
 
 This infrastructure repository uses metadata-only reusable approval and reviewed single-pass merge workflows pinned to `victron-venus/venus-os-ci-toolkit` commit `21a366f200f0371a10a6de7ad6ca263af230b842`. For same-repository branches authored by the maintainer with verified public no-reply identity, add `auto-approve` to request the existing independent bot review, and `automerge` to request squash merge after all reported checks succeed, including `Terraform validation` and `CodeQL`. The merge evaluator verifies the exact head, current default branch and approval repeatedly; it does not use native auto-merge or bypass protection. Completion events and a recovery schedule re-evaluate waiting requests. These jobs never check out or execute pull-request code. Bot-authored PRs require an explicit public no-reply author identity at manual squash merge until that account's merge identity is verified; the reviewer remains `californiantiramisu`.
+
+### Public release reviewers
+
+`public-release-reviewers.tf` gives the existing `californiantiramisu` reviewer
+repository-scoped Write access to `home-assistant`, `home-studio`, and
+`k3s-self-healing`. Read-only organization membership cannot provide an approval
+that satisfies their protected branch rules. Each target must remain public and
+active. The grant does not change required CI, approval counts, last-push review,
+secret access, runner selection, or rule bypasses.
