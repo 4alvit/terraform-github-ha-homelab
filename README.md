@@ -325,10 +325,11 @@ This infrastructure repository uses metadata-only reusable approval and reviewed
 ### Public release reviewers
 
 `public-release-reviewers.tf` gives the existing `californiantiramisu` reviewer
-repository-scoped Write access to the nine explicitly listed public release and
-validation projects: `ha-echo-dot`, `ha-echo-show-5`, `ha-meter-contracts`,
+repository-scoped Write access to the thirteen explicitly listed public release,
+validation, and security-maintenance projects: `.github`, `assist-scenario-lab`,
+`ha-echo-dot`, `ha-echo-show-5`, `ha-entity-migrations`, `ha-meter-contracts`,
 `ha-scenario-tests`, `home-assistant`, `home-studio`, `k3s-self-healing`,
-`slzb-06-recovery`, and `zac93-esp32`. Read-only organization membership cannot
-provide an approval that satisfies protected branch rules. Each target must
+`rf-airbridge`, `slzb-06-recovery`, and `zac93-esp32`. Read-only organization
+membership cannot provide an approval that satisfies protected branch rules. Each target must
 remain public and active. The grant does not change required CI, approval counts,
 last-push review, secret access, runner selection, or rule bypasses.
