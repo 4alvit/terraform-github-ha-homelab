@@ -15,7 +15,7 @@ run "scoped_reviewer_has_write_without_administration" {
   }
   assert {
     condition = (
-      toset(keys(github_repository_collaborator.public_release_reviewers)) == toset(["home-assistant", "home-studio", "k3s-self-healing"]) &&
+      toset(keys(github_repository_collaborator.public_release_reviewers)) == toset(["ha-echo-dot", "ha-echo-show-5", "ha-meter-contracts", "ha-scenario-tests", "home-assistant", "home-studio", "k3s-self-healing", "slzb-06-recovery", "zac93-esp32"]) &&
       alltrue([for name, reviewer in github_repository_collaborator.public_release_reviewers :
         reviewer.repository == name &&
         reviewer.username == "californiantiramisu" &&

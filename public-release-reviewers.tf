@@ -2,9 +2,15 @@
 # protected branch policy. It grants neither administration nor rule bypass.
 locals {
   public_release_review_repositories = toset([
+    "ha-echo-dot",
+    "ha-echo-show-5",
+    "ha-meter-contracts",
+    "ha-scenario-tests",
     "home-assistant",
     "home-studio",
     "k3s-self-healing",
+    "slzb-06-recovery",
+    "zac93-esp32",
   ])
 }
 
