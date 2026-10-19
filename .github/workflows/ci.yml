@@ -42,6 +42,10 @@ jobs:
         run: terraform validate -no-color
       - name: Test public security policy without live API access
         run: bash scripts/test-public-security.sh
+      - name: Test independent environment policy verification
+        run: python3 -m unittest discover -s tests -p 'test_closed_environment.py'
+      - name: Verify the live closed-build review and branch policy
+        run: python3 scripts/check-closed-environment.py
       - name: Analyze all Terraform source
         run: tflint --config="$PWD/.tflint.hcl" --recursive
       - name: Verify isolated secure-provider builder

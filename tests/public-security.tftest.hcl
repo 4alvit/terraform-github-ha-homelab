@@ -8,6 +8,21 @@ mock_provider "github" {
   }
 }
 
+run "home_studio_closed_jobs_require_main_and_review" {
+  command = plan
+  assert {
+    condition = (
+      github_repository_environment.home_studio_closed_build.environment == "closed-build" &&
+      !github_repository_environment.home_studio_closed_build.can_admins_bypass &&
+      one(github_repository_environment.home_studio_closed_build.reviewers).users == toset([272257197]) &&
+      one(github_repository_environment.home_studio_closed_build.deployment_branch_policy).custom_branch_policies &&
+      !one(github_repository_environment.home_studio_closed_build.deployment_branch_policy).protected_branches &&
+      github_repository_environment_deployment_policy.home_studio_closed_main.branch_pattern == "main"
+    )
+    error_message = "Closed package credentials must be restricted to reviewed main-branch jobs without an administrator bypass."
+  }
+}
+
 run "zac93_requires_source_and_secret_checks_without_bypass" {
   command = plan
   assert {
