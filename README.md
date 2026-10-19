@@ -21,6 +21,8 @@ automations, scripts, household data, and credentials belong in private reposito
 
 The reusable adapters in `public-adapters.tf` start with fresh public history:
 
+- `ha-ottplay` — media-player entities for OTTPlay devices registered with its
+  remote control server, with HACS installation and local Home Assistant setup.
 - `ha-onvif-room-direction` — read-only camera direction mapped to configured areas.
 - `ruview-home-assistant` — expiring per-node observations through MQTT discovery.
 - `ha-access-session` — signed Access identity exchange and a restricted HA gateway.

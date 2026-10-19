@@ -2,6 +2,10 @@
 # policy are managed here; each project owns its sanitized source and release CI.
 locals {
   public_adapters = {
+    ha-ottplay = {
+      description = "Home Assistant media players for OTTPlay devices registered with the remote control server"
+      topics      = ["home-assistant", "hacs", "media-player", "ottplay", "iptv", "python"]
+    }
     ha-onvif-room-direction = {
       description = "Home Assistant area estimates from read-only ONVIF camera direction, with configurable sectors and freshness checks"
       topics      = ["home-assistant", "onvif", "camera", "hacs", "python"]

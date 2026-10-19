@@ -29,6 +29,7 @@ jobs:
           import subprocess
 
           allowed = {
+              "ha-homelab/ha-ottplay",
               "ha-homelab/ha-onvif-room-direction",
               "ha-homelab/ruview-home-assistant",
               "ha-homelab/ha-access-session",

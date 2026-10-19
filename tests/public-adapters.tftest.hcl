@@ -8,10 +8,13 @@ mock_provider "github" {
   }
 }
 
-run "four_adapters_require_review_checks_and_secret_protection" {
+run "public_adapters_require_review_checks_and_secret_protection" {
   command = plan
   assert {
-    condition = length(github_repository.public_adapters) == 4 && alltrue([
+    condition = toset(keys(github_repository.public_adapters)) == toset([
+      "ha-ottplay", "ha-onvif-room-direction", "ruview-home-assistant",
+      "ha-access-session", "sensing-evidence-kit"
+      ]) && alltrue([
       for name, repository in github_repository.public_adapters : (
         repository.visibility == "public" &&
         repository.allow_auto_merge &&
@@ -29,6 +32,6 @@ run "four_adapters_require_review_checks_and_secret_protection" {
         github_repository_environment_deployment_policy.public_adapters_release[name].branch_pattern == "main"
       )
     ])
-    error_message = "All four public adapters require secret protection, independent review, CI, immutable version tags and main-only releases."
+    error_message = "Every public adapter, including OTTPlay, requires secret protection, independent review, CI, immutable version tags and main-only releases."
   }
 }
