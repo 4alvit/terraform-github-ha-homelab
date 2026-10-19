@@ -115,6 +115,10 @@ The import blocks retain the existing environment and branch-policy identities.
 Apply only a reviewed plan for these two resources; adoption should import them
 without changing live settings. To stop Terraform ownership, remove the resources
 from state without destroying the environment or its retained secrets.
+Run `python3 scripts/check-closed-environment.py` before and after each scoped
+plan/apply; CI also runs this anonymous, metadata-only check. Provider 6.13.0 can
+retain a stale reviewer in state after the last live reviewer is removed, so a
+clean Terraform plan alone does not prove that approval is still required.
 
 Before applying, verify the live check name and app identity, then review a remote
 plan targeted to `github_repository_ruleset.home_studio_ci`. It should create only
