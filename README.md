@@ -106,6 +106,16 @@ required package, browser, installation and workflow checks. No additional revie
 count or merge-method restriction is introduced. Repository settings, collaborators,
 secrets and release environments are outside this resource's ownership.
 
+`home-studio-closed-build.tf` separately adopts the existing `closed-build`
+environment and its `main` deployment branch policy. Jobs require approval from
+`4alvit`; administrators cannot bypass that review. The existing single-maintainer
+policy permits the owner to approve a run they triggered. Encryption keys and
+storage credentials remain operator-managed outside Terraform state.
+The import blocks retain the existing environment and branch-policy identities.
+Apply only a reviewed plan for these two resources; adoption should import them
+without changing live settings. To stop Terraform ownership, remove the resources
+from state without destroying the environment or its retained secrets.
+
 Before applying, verify the live check name and app identity, then review a remote
 plan targeted to `github_repository_ruleset.home_studio_ci`. It should create only
 that ruleset. A failing Home Studio gate must block merging; changing the ruleset
