@@ -110,10 +110,11 @@ locals {
       topics                 = ["amazon-echo", "echo-dot", "echomuse", "home-assistant", "openwakeword", "voice-assistant"]
     }
     ha-desloc = {
-      description = "Unofficial DESLOC C100 Plus cloud integration for Home Assistant: lock control, state, battery and Wi-Fi signal"
-      visibility  = "public"
-      has_issues  = true
-      topics      = ["desloc", "hacs", "home-assistant", "home-assistant-custom-component", "smart-lock", "python"]
+      description      = "Unofficial DESLOC C100 Plus cloud integration for Home Assistant: lock control, state, battery and Wi-Fi signal"
+      visibility       = "public"
+      has_issues       = true
+      allow_auto_merge = true
+      topics           = ["desloc", "hacs", "home-assistant", "home-assistant-custom-component", "smart-lock", "python"]
     }
     ha-desloc-card = {
       description = "Home Assistant Lovelace card for DESLOC locks: state, battery, Wi-Fi signal and confirmed unlock controls"
