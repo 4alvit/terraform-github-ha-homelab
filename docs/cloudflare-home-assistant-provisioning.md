@@ -18,10 +18,15 @@ to Cloudflare. Public source is reviewed and published separately.
    appear as no-ops; reject unexpected updates. The ruleset allows only squash PR
    merges, one current independent approval, resolved review threads and successful
    up-to-date `CI gate` from GitHub Actions. It has no bypass actors.
-5. Accept only the scoped review-bot invitation with the existing metadata-only
+5. Reconcile only this new ruleset's
+   `require_extra_approval_for_unattributed_changes` flag to `false`, preserving
+   every other field and saving a private before/after receipt. The pinned provider
+   cannot serialize this flag; see [the existing review-policy procedure](public-security.md#extra-copilot-approval-after-terraform).
+   Do not apply unrelated organization-wide reconciliation changes.
+6. Accept only the scoped review-bot invitation with the existing metadata-only
    `accept-adapter-reviewer.yml` workflow after this change is on `main`. Verify
    effective Write permission. An invitation alone is not an accepted role.
-6. Verify public visibility, protections, Actions defaults, dependency alerts and
+7. Verify public visibility, protections, Actions defaults, dependency alerts and
    this repository's membership in the existing `BOT_PAT` allowlist. Finish with
    a fresh scoped plan showing no changes. A scoped no-op is not evidence that
    unrelated full-workspace drift has been reconciled.
