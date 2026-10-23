@@ -12,7 +12,8 @@ run "public_cloudflare_module_has_scoped_review_and_no_deployment_data" {
   command = plan
   override_resource {
     override_during = plan
-    target          = github_repository.cloudflare_home_assistant
+
+    target = github_repository.cloudflare_home_assistant
     values = {
       repo_id = 424243
     }
