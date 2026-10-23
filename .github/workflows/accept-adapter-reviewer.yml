@@ -35,6 +35,7 @@ jobs:
               "ha-homelab/ha-access-session",
               "ha-homelab/sensing-evidence-kit",
               "ha-homelab/ruview-home-sensing",
+              "ha-homelab/terraform-cloudflare-home-assistant",
           }
 
           def api(path, method="GET", paginate=False):
