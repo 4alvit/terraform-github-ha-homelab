@@ -9,6 +9,11 @@ automations, scripts, household data, and credentials belong in private reposito
 
 ## Public project ownership
 
+- `ha-homelab/terraform-cloudflare-home-assistant` — reusable Cloudflare Tunnel
+  and Home Assistant Terraform configuration with synthetic examples and private
+  deployment inputs. No deployment domain, account identifiers, state, credentials
+  or household inventory is published. See the [scoped provisioning procedure](docs/cloudflare-home-assistant-provisioning.md).
+
 - `ha-homelab/asterisk-telephony` — reusable Home Assistant/Asterisk companion
   with AMI event bridging, phone entities, call actions and deployment guidance.
   Household topology, SIP/AMI credentials and Cisco firmware remain outside the
@@ -243,7 +248,8 @@ gh workflow run accept-adapter-reviewer.yml --ref main
 
 The existing `BOT_PAT` must belong to `californiantiramisu`. The workflow accepts
 only that user's write invitations for the four repositories in
-`local.public_adapters` and `ha-homelab/ruview-home-sensing`. It does not create permissions, accept other invitations,
+`local.public_adapters` and `ha-homelab/ruview-home-sensing` plus
+`ha-homelab/terraform-cloudflare-home-assistant`. It does not create permissions, accept other invitations,
 check out source, approve PRs, or bypass protections. Re-running is safe: already
 accepted invitations are no longer returned. Verify the bot has `write`
 permission, then rerun each repository's normal review workflow if necessary.
