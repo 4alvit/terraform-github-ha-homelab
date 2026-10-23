@@ -10,7 +10,14 @@ is supplied by the integration's existing shared CI workflow. An empty
 `public_security_enforcement_repositories` value cannot disable this policy.
 Live visibility and archive checks still apply.
 
-The other five audited public repositories preserve their current administrator
+RF Airbridge also requires one current approval without bypass, plus its actual
+`test` and `Compile ESPHome example` checks, bound to GitHub Actions
+(`15368`) and an up-to-date branch. Its shared metadata-only bot approval is
+opted into with `automerge`. Merge and verify that workflow before applying the
+RF ruleset change; then read back the live approval count and both check names.
+This activates the previously deferred policy, without creating a parallel ruleset.
+
+The other four audited public repositories preserve their current administrator
 bypass and review settings by default. Set
 `public_security_enforcement_repositories` only for repositories whose approval
 automation has been verified; activation enables the same current-review policy

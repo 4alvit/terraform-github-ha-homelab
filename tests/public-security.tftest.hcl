@@ -167,7 +167,7 @@ run "empty_optional_activation_cannot_disable_desloc_policy" {
   }
   assert {
     condition = (
-      local.review_required_public_software_repositories == toset(["ha-desloc"]) &&
+      local.review_required_public_software_repositories == toset(["ha-desloc", "rf-airbridge"]) &&
       length(github_repository_ruleset.desloc.bypass_actors) == 0 &&
       one(one(github_repository_ruleset.desloc.rules).pull_request).required_approving_review_count == 1 &&
       one(one(github_repository_ruleset.desloc.rules).required_status_checks).strict_required_status_checks_policy &&
@@ -422,8 +422,7 @@ run "unactivated_public_reviews_preserve_existing_bypasses" {
         github_repository_ruleset.desloc_card,
         github_repository_ruleset.echo_dot,
         github_repository_ruleset.echo_show_5,
-        github_repository_ruleset.slzb_06_recovery,
-        github_repository_ruleset.rf_airbridge
+        github_repository_ruleset.slzb_06_recovery
         ] : (
         length(policy.bypass_actors) == 1 &&
         one(one(policy.rules).pull_request).required_approving_review_count == 0 &&
@@ -503,4 +502,64 @@ run "echomuse_bot_rejects_archived_repository" {
     github_repository_collaborator.echomuse_bot,
     github_actions_organization_secret_repository.echomuse_bot_pat,
   ]
+}
+
+run "rf_airbridge_requires_current_review_and_actual_ci_by_default" {
+  command = plan
+  variables {
+    public_security_enforcement_repositories = []
+  }
+  assert {
+    condition = (
+      github_repository_ruleset.rf_airbridge.enforcement == "active" &&
+      toset(one(one(github_repository_ruleset.rf_airbridge.conditions).ref_name).include) == toset(["~DEFAULT_BRANCH"]) &&
+      length(github_repository_ruleset.rf_airbridge.bypass_actors) == 0 &&
+      one(one(github_repository_ruleset.rf_airbridge.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.rf_airbridge.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.rf_airbridge.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.rf_airbridge.rules).pull_request).required_review_thread_resolution &&
+      one(one(github_repository_ruleset.rf_airbridge.rules).required_status_checks).strict_required_status_checks_policy &&
+      toset([for check in one(one(github_repository_ruleset.rf_airbridge.rules).required_status_checks).required_check : check.context]) == toset(["test", "Compile ESPHome example"]) &&
+      alltrue([for check in one(one(github_repository_ruleset.rf_airbridge.rules).required_status_checks).required_check : check.integration_id == 15368])
+    )
+    error_message = "RF Airbridge must require one current approval and both actual GitHub Actions validation jobs, without bypass."
+  }
+}
+
+run "rf_airbridge_private_keeps_existing_policy" {
+  command = plan
+  override_data {
+    target = data.github_repository.public_software["rf-airbridge"]
+    values = {
+      visibility = "private"
+      archived   = false
+    }
+  }
+  assert {
+    condition = (
+      length(github_repository_ruleset.rf_airbridge.bypass_actors) == 1 &&
+      one(one(github_repository_ruleset.rf_airbridge.rules).pull_request).required_approving_review_count == 0 &&
+      length(one(github_repository_ruleset.rf_airbridge.rules).required_status_checks) == 0
+    )
+    error_message = "Public review and CI activation must not change an excluded RF Airbridge repository."
+  }
+}
+
+run "rf_airbridge_archived_keeps_existing_policy" {
+  command = plan
+  override_data {
+    target = data.github_repository.public_software["rf-airbridge"]
+    values = {
+      visibility = "public"
+      archived   = true
+    }
+  }
+  assert {
+    condition = (
+      length(github_repository_ruleset.rf_airbridge.bypass_actors) == 1 &&
+      one(one(github_repository_ruleset.rf_airbridge.rules).pull_request).required_approving_review_count == 0 &&
+      length(one(github_repository_ruleset.rf_airbridge.rules).required_status_checks) == 0
+    )
+    error_message = "Public review and CI activation must not change an excluded RF Airbridge repository."
+  }
 }

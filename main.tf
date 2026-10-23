@@ -587,5 +587,19 @@ resource "github_repository_ruleset" "rf_airbridge" {
       required_approving_review_count   = contains(local.review_required_public_software_repositories, "rf-airbridge") ? 1 : 0
       required_review_thread_resolution = true
     }
+    dynamic "required_status_checks" {
+      for_each = contains(local.active_public_software_repositories, "rf-airbridge") ? [true] : []
+      content {
+        strict_required_status_checks_policy = true
+        required_check {
+          context        = "test"
+          integration_id = 15368
+        }
+        required_check {
+          context        = "Compile ESPHome example"
+          integration_id = 15368
+        }
+      }
+    }
   }
 }
