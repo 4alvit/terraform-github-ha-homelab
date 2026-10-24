@@ -440,7 +440,14 @@ run "existing_ci_and_auto_merge_settings_are_preserved" {
     condition = (
       github_repository.repositories["zigbee-direct-button"].allow_auto_merge &&
       github_repository.repositories["ha-tuya-esphome"].allow_auto_merge &&
+      github_repository.repositories["ha-desloc-card"].allow_auto_merge &&
       !github_repository.repositories[".github"].allow_auto_merge &&
+      one(one(github_repository_ruleset.desloc_card.rules).required_status_checks).strict_required_status_checks_policy &&
+      length(one(one(github_repository_ruleset.desloc_card.rules).required_status_checks).required_check) == 1 &&
+      alltrue([
+        for check in one(one(github_repository_ruleset.desloc_card.rules).required_status_checks).required_check :
+        check.context == "CI gate" && check.integration_id == 15368
+      ]) &&
       toset([for check in one(one(github_repository_ruleset.zigbee_direct_button.rules).required_status_checks).required_check : check.context]) == toset(["CI gate", "test"]) &&
       toset([for check in one(one(github_repository_ruleset.tuya_esphome.rules).required_status_checks).required_check : check.context]) == toset(["check"]) &&
       toset([for check in one(one(github_repository_ruleset.echo_show_5.rules).required_status_checks).required_check : check.context]) == toset(["CI gate"])

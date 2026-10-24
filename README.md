@@ -81,7 +81,9 @@ public versions while retaining deployment, geometry and device bindings private
   default branch, vulnerability alerts, and Dependabot security updates first;
   publish reviewed source and verify the `CI gate` before applying its ruleset.
 - `ha-homelab/ha-desloc-card` — public Lovelace dashboard card for the DESLOC
-  integration, distributed separately through HACS.
+  integration, distributed separately through HACS. Auto-merge is enabled;
+  its active public default branch requires up-to-date PRs and the GitHub Actions
+  `CI gate`. Review activation remains controlled by the existing policy.
 
 - `ha-homelab/ha-desloc` — public, unofficial DESLOC C100 Plus integration for
   Home Assistant, including HACS packaging, source, tests, and documentation.
