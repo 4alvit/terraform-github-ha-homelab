@@ -12,6 +12,12 @@ variable "public_security_enforcement_repositories" {
   }
 }
 
+variable "desloc_quota_review_policy_enabled" {
+  description = "Use the verified Review policy check instead of native approval counting for public, active ha-desloc only. Enable after its trusted workflow is deployed and verified on a current pull-request head."
+  type        = bool
+  default     = true
+}
+
 # Public software explicitly audited for the OpenSSF rollout. Private and archived
 # repositories are excluded using live visibility before new rules are created.
 locals {
@@ -48,5 +54,12 @@ locals {
       local.mandatory_review_public_software_repositories,
       var.public_security_enforcement_repositories,
     ),
+  )
+
+  # Keep DESLOC in the mandatory protection set: changing the approval mechanism
+  # must never restore an administrator bypass or affect another repository.
+  desloc_quota_review_policy_active = (
+    var.desloc_quota_review_policy_enabled &&
+    contains(local.review_required_public_software_repositories, "ha-desloc")
   )
 }

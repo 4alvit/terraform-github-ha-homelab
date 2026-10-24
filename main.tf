@@ -359,6 +359,8 @@ resource "github_repository_ruleset" "profile" {
 }
 
 # Public integration source requires current review and the shared CI gate.
+# The opt-in policy check can recognize an authenticated review-quota exception;
+# native approval counting cannot express this conditional rule.
 resource "github_repository_ruleset" "desloc" {
   name        = "Protect main"
   repository  = github_repository.repositories["ha-desloc"].name
@@ -386,9 +388,9 @@ resource "github_repository_ruleset" "desloc" {
     non_fast_forward = true
     pull_request {
       dismiss_stale_reviews_on_push     = contains(local.review_required_public_software_repositories, "ha-desloc")
-      require_last_push_approval        = contains(local.review_required_public_software_repositories, "ha-desloc")
+      require_last_push_approval        = contains(local.review_required_public_software_repositories, "ha-desloc") && !local.desloc_quota_review_policy_active
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = contains(local.review_required_public_software_repositories, "ha-desloc") ? 1 : 0
+      required_approving_review_count   = contains(local.review_required_public_software_repositories, "ha-desloc") && !local.desloc_quota_review_policy_active ? 1 : 0
       required_review_thread_resolution = true
     }
     dynamic "required_status_checks" {
@@ -398,6 +400,13 @@ resource "github_repository_ruleset" "desloc" {
         required_check {
           context        = "CI gate"
           integration_id = 15368
+        }
+        dynamic "required_check" {
+          for_each = local.desloc_quota_review_policy_active ? [true] : []
+          content {
+            context        = "Review policy"
+            integration_id = 15368
+          }
         }
       }
     }
