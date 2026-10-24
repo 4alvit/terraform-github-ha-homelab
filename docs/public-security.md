@@ -162,6 +162,38 @@ For a DESLOC-only transition, do not run the owner-wide mutation as an incidenta
 cleanup: if the flag changed, save and reconcile only ruleset `24293264`, preserving
 its other fields, and verify the live result.
 
+Use this scoped command after the Terraform apply. It requires authenticated
+`gh` and `jq`, saves a private backup, changes only the extra-approval flag, and
+compares all writable settings after reading the rule back. An already-correct
+rule needs no write. Run it without concurrent ruleset edits.
+
+```sh
+set -eu
+umask 077
+backup_dir=$(mktemp -d "${TMPDIR:-/tmp}/desloc-review-policy.XXXXXX")
+endpoint=repos/ha-homelab/ha-desloc/rulesets/24293264
+settings='{name, target, enforcement, bypass_actors, conditions, rules}'
+gh api "$endpoint" > "$backup_dir/before.json"
+jq -e '.id == 24293264 and .source_type == "Repository" and
+  .source == "ha-homelab/ha-desloc" and
+  ([.rules[] | select(.type == "pull_request")] | length == 1)' \
+  "$backup_dir/before.json" > /dev/null
+jq -S "$settings" "$backup_dir/before.json" > "$backup_dir/settings.json"
+jq -S '(.rules[] | select(.type == "pull_request") |
+  .parameters.require_extra_approval_for_unattributed_changes) = false' \
+  "$backup_dir/settings.json" > "$backup_dir/desired.json"
+if ! cmp -s "$backup_dir/settings.json" "$backup_dir/desired.json"; then
+  gh api "$endpoint" > "$backup_dir/current.json"
+  jq -S "$settings" "$backup_dir/current.json" > "$backup_dir/current-settings.json"
+  cmp "$backup_dir/settings.json" "$backup_dir/current-settings.json"
+  gh api --method PUT "$endpoint" --input "$backup_dir/desired.json" > /dev/null
+fi
+gh api "$endpoint" > "$backup_dir/after.json"
+jq -S "$settings" "$backup_dir/after.json" > "$backup_dir/actual.json"
+cmp "$backup_dir/desired.json" "$backup_dir/actual.json"
+printf 'DESLOC review policy verified. Backup: %s\n' "$backup_dir"
+```
+
 ## Trust boundaries
 
 Terraform credentials can change repository governance; store them in the
