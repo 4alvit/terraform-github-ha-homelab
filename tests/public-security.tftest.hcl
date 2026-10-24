@@ -113,6 +113,7 @@ run "existing_public_rules_require_one_current_review" {
   command = plan
   variables {
     public_security_enforcement_repositories = ["ha-desloc", "ha-desloc-card", "ha-echo-dot", "ha-echo-show-5", "slzb-06-recovery", "rf-airbridge"]
+    desloc_quota_review_policy_enabled       = false
   }
   assert {
     condition = length(local.active_public_software_repositories) == 6 && alltrue([
@@ -135,8 +136,11 @@ run "existing_public_rules_require_one_current_review" {
   }
 }
 
-run "desloc_requires_current_review_and_ci_by_default" {
+run "desloc_native_review_fallback_keeps_current_review_and_ci" {
   command = plan
+  variables {
+    desloc_quota_review_policy_enabled = false
+  }
   assert {
     condition = (
       github_repository_ruleset.desloc.enforcement == "active" &&
@@ -156,7 +160,7 @@ run "desloc_requires_current_review_and_ci_by_default" {
         check.context == "CI gate" && check.integration_id == 15368
       ])
     )
-    error_message = "DESLOC must always require one current approval and the strict GitHub Actions CI gate, with no bypass."
+    error_message = "Disabling the quota policy must restore one current native approval and retain the strict GitHub Actions CI gate, with no bypass."
   }
 }
 
@@ -164,6 +168,7 @@ run "empty_optional_activation_cannot_disable_desloc_policy" {
   command = plan
   variables {
     public_security_enforcement_repositories = []
+    desloc_quota_review_policy_enabled       = false
   }
   assert {
     condition = (
@@ -177,9 +182,89 @@ run "empty_optional_activation_cannot_disable_desloc_policy" {
   }
 }
 
+run "desloc_quota_policy_requires_both_trusted_checks_without_bypass" {
+  command = plan
+  assert {
+    condition = (
+      local.desloc_quota_review_policy_active &&
+      contains(local.review_required_public_software_repositories, "ha-desloc") &&
+      github_repository_ruleset.desloc.enforcement == "active" &&
+      toset(one(one(github_repository_ruleset.desloc.conditions).ref_name).include) == toset(["~DEFAULT_BRANCH"]) &&
+      length(one(one(github_repository_ruleset.desloc.conditions).ref_name).exclude) == 0 &&
+      length(github_repository_ruleset.desloc.bypass_actors) == 0 &&
+      one(github_repository_ruleset.desloc.rules).deletion &&
+      one(github_repository_ruleset.desloc.rules).non_fast_forward &&
+      one(one(github_repository_ruleset.desloc.rules).pull_request).required_approving_review_count == 0 &&
+      !one(one(github_repository_ruleset.desloc.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.desloc.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.desloc.rules).pull_request).required_review_thread_resolution &&
+      toset(one(one(github_repository_ruleset.desloc.rules).pull_request).allowed_merge_methods) == toset(["squash"]) &&
+      one(one(github_repository_ruleset.desloc.rules).required_status_checks).strict_required_status_checks_policy &&
+      length(one(one(github_repository_ruleset.desloc.rules).required_status_checks).required_check) == 2 &&
+      toset([for check in one(one(github_repository_ruleset.desloc.rules).required_status_checks).required_check : check.context]) == toset(["CI gate", "Review policy"]) &&
+      alltrue([
+        for check in one(one(github_repository_ruleset.desloc.rules).required_status_checks).required_check :
+        check.integration_id == 15368
+      ])
+    )
+    error_message = "The DESLOC quota policy must atomically replace native approvals with the strict GitHub Actions Review policy check while preserving CI, PRs, threads, history protection and no bypass."
+  }
+}
+
+run "desloc_quota_policy_does_not_change_other_review_policies" {
+  command = plan
+  variables {
+    public_security_enforcement_repositories = ["ha-desloc", "ha-desloc-card", "ha-echo-dot", "ha-echo-show-5", "slzb-06-recovery", "rf-airbridge"]
+    desloc_quota_review_policy_enabled       = true
+  }
+  assert {
+    condition = alltrue([
+      for policy in [
+        github_repository_ruleset.desloc_card,
+        github_repository_ruleset.echo_dot,
+        github_repository_ruleset.echo_show_5,
+        github_repository_ruleset.slzb_06_recovery,
+        github_repository_ruleset.rf_airbridge
+        ] : (
+        length(policy.bypass_actors) == 0 &&
+        one(one(policy.rules).pull_request).required_approving_review_count == 1 &&
+        one(one(policy.rules).pull_request).dismiss_stale_reviews_on_push &&
+        one(one(policy.rules).pull_request).require_last_push_approval &&
+        one(one(policy.rules).pull_request).required_review_thread_resolution &&
+        alltrue([
+          for checks in one(policy.rules).required_status_checks :
+          alltrue([for check in checks.required_check : check.context != "Review policy"])
+        ])
+      )
+    ])
+    error_message = "Enabling the DESLOC quota exception must not replace native review or add Review policy checks on other repositories, including the card."
+  }
+}
+
+run "desloc_quota_policy_preserves_card_defaults" {
+  command = plan
+  variables {
+    public_security_enforcement_repositories = []
+    desloc_quota_review_policy_enabled       = true
+  }
+  assert {
+    condition = (
+      length(github_repository_ruleset.desloc_card.bypass_actors) == 1 &&
+      one(one(github_repository_ruleset.desloc_card.rules).pull_request).required_approving_review_count == 0 &&
+      !one(one(github_repository_ruleset.desloc_card.rules).pull_request).require_last_push_approval &&
+      !one(one(github_repository_ruleset.desloc_card.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.desloc_card.rules).pull_request).required_review_thread_resolution &&
+      one(one(github_repository_ruleset.desloc_card.rules).required_status_checks).strict_required_status_checks_policy &&
+      toset([for check in one(one(github_repository_ruleset.desloc_card.rules).required_status_checks).required_check : check.context]) == toset(["CI gate"])
+    )
+    error_message = "DESLOC quota-policy activation must leave the independent card's existing approval, bypass and required CI settings untouched."
+  }
+}
+
 run "private_repository_preserves_existing_policy" {
   variables {
     public_security_enforcement_repositories = []
+    desloc_quota_review_policy_enabled       = true
   }
   command         = plan
   expect_failures = [github_repository_collaborator.desloc_coderabbit["ha-desloc"]]
@@ -193,6 +278,7 @@ run "private_repository_preserves_existing_policy" {
   assert {
     condition = (
       !contains(local.active_public_software_repositories, "ha-desloc") &&
+      !local.desloc_quota_review_policy_active &&
       length(github_repository_ruleset.desloc.bypass_actors) == 1 &&
       one(one(github_repository_ruleset.desloc.rules).pull_request).required_approving_review_count == 0 &&
       !one(one(github_repository_ruleset.desloc.rules).pull_request).require_last_push_approval &&
@@ -207,6 +293,7 @@ run "private_repository_preserves_existing_policy" {
 run "archived_repository_preserves_existing_policy" {
   variables {
     public_security_enforcement_repositories = []
+    desloc_quota_review_policy_enabled       = true
   }
   command         = plan
   expect_failures = [github_repository_collaborator.desloc_coderabbit["ha-desloc"]]
@@ -220,6 +307,7 @@ run "archived_repository_preserves_existing_policy" {
   assert {
     condition = (
       !contains(local.active_public_software_repositories, "ha-desloc") &&
+      !local.desloc_quota_review_policy_active &&
       length(github_repository_ruleset.desloc.bypass_actors) == 1 &&
       one(one(github_repository_ruleset.desloc.rules).pull_request).required_approving_review_count == 0 &&
       !one(one(github_repository_ruleset.desloc.rules).pull_request).require_last_push_approval &&

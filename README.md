@@ -192,14 +192,19 @@ GitHub Free does not support enforced private-repository rulesets; see
 [GitHub's availability documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
 The public `.github` profile retains its existing active protection and
 administrator bypass. Its Terraform resource address and remote ID are unchanged.
-The public `ha-desloc` integration requires one current approval, resolved review
-threads, and the strict `CI gate` check from GitHub Actions, without bypasses.
-This policy is mandatory even when `public_security_enforcement_repositories`
-is empty. Its existing ruleset is updated in place; the shared CI workflow remains
-owned by the integration repository. The other five audited public code repositories
-retain their current review and bypass settings until explicitly activated through
-that variable. Activation requires verified approval automation and enables one
-current approval without bypasses. Existing required CI checks remain in place.
+The public `ha-desloc` integration requires pull requests, resolved review threads,
+protected history, and the strict GitHub Actions `CI gate`, without bypasses.
+The `desloc_quota_review_policy_enabled` transition replaces its native approval
+count with a required `Review policy` check after that workflow has been verified.
+The workflow requires a current-head approval except for a verified CodeRabbit
+quota result; requested changes still block merging. This changes reviewer
+independence from last-pusher independence to pull-request-author independence.
+An empty `public_security_enforcement_repositories` value cannot remove the
+mandatory protections. The existing ruleset is updated in place, and the card's
+ruleset is unchanged. RF Airbridge retains its mandatory current-review policy;
+the other four audited public repositories retain their current review and bypass
+settings until explicitly activated through that variable. Existing required CI
+checks remain in place.
 See the [public security policy](docs/public-security.md) for activation and verification.
 No private-repository access policy changes are implied.
 

@@ -2,13 +2,48 @@
 
 `public-security.tf` lists the public repositories reviewed for this rollout.
 Live metadata excludes private and archived repositories from new protections.
-The public `ha-desloc` integration always requires one current approval, dismisses
-stale approvals, requires approval after the last push, resolves review threads,
-and has no bypass actors. Its existing `Protect main` ruleset also requires the
-strict `CI gate` check bound to GitHub Actions (integration ID `15368`). The gate
-is supplied by the integration's existing shared CI workflow. An empty
-`public_security_enforcement_repositories` value cannot disable this policy.
-Live visibility and archive checks still apply.
+The public `ha-desloc` integration requires pull requests, resolved review
+threads, protected history, and the strict `CI gate` check bound to GitHub Actions
+(integration ID `15368`), with no bypass actors. Its review policy is either one
+current native approval or the quota-aware `Review policy` check described below.
+An empty `public_security_enforcement_repositories` value cannot remove these
+protections. Live visibility and archive checks still apply.
+
+## DESLOC review quota policy
+
+`desloc_quota_review_policy_enabled` selects the review mechanism for the public,
+active `ha-desloc` repository only. Its versioned default is `true`; deploy and
+verify the gate before merging or applying this transition. Setting it to `false`
+restores one native approval, stale-approval dismissal, and approval after the
+last push. Enabling it replaces the native approval count with the strict
+`Review policy` check, also bound to
+GitHub Actions (`15368`). The existing `CI gate`, required pull requests, resolved
+threads, no-bypass policy, and deletion/force-push protection remain in force.
+The card and all other repositories are unchanged.
+
+The trusted workflow normally requires an approval on the current pull-request
+head from the authentic CodeRabbit bot or a collaborator with Write, Maintain,
+or Admin access, excluding the pull-request author. Its limited exception is an
+authentic CodeRabbit commit status for that same head whose latest status is
+successful and reports `Review rate limited`. A missing status, an ordinary skip,
+a pending review, an unrecognized error, or an older-head result cannot establish
+that exception. An outstanding trusted `CHANGES_REQUESTED` review blocks either path.
+The gate does not create an approving review to satisfy GitHub's counter.
+
+This intentionally replaces native last-pusher independence with author
+independence: an eligible reviewer who pushed the last commit can satisfy the
+workflow policy if they are not the pull-request author. A quota exception also
+allows merging without a completed CodeRabbit review; CI and thread resolution
+are still required. GitHub's native approval count cannot express this conditional
+exception, so its count becomes zero and `require_last_push_approval` becomes
+false together with adding the required gate. Stale-review dismissal remains
+enabled, and the workflow itself only accepts current-head approvals.
+
+The status producer must run trusted default-branch workflow code, inspect GitHub
+metadata without executing pull-request code, and report against the exact head
+it evaluated. Binding to GitHub Actions identifies the app, not an individual
+workflow; changes to workflows and shared-workflow pins therefore remain part of
+the repository's review trust boundary.
 
 RF Airbridge also requires one current approval without bypass, plus its actual
 `test` and `Compile ESPHome example` checks, bound to GitHub Actions
@@ -72,10 +107,40 @@ live default-branch rules and required check identity after applying. A full pla
 must still be inspected for unrelated drift; do not apply other repositories'
 changes as part of this repair. The separate card repository is outside its scope.
 
-One current approval from a reviewer with Write access satisfies the review
-count. Automation may provide that approval; it does not replace the required CI
-checks or resolution of review threads. Keep the count at one when reconciling
-Terraform with GitHub so a later apply cannot restore a two-review requirement.
+For the quota-policy transition, use this order:
+
+1. Merge the shared policy workflow and DESLOC adapter while the existing native
+   approval requirement is still active. Verify that the trusted workflow creates
+   a `Review policy` result on the current head of an open DESLOC pull request.
+   Check the review-required and quota-exception behavior with the policy tests.
+2. After that verification, review and merge the Terraform transition whose
+   versioned `desloc_quota_review_policy_enabled` default is `true`. Do not rely on
+   a one-off CLI `-var` override or an undocumented workspace variable that a
+   future plan could reverse. Merging source does not apply the HCP state.
+3. From that reviewed commit, initialize the existing HCP workspace
+   `victron-venus/github-ha-homelab-infrastructure` and inspect a targeted plan:
+   `terraform plan -target=github_repository_ruleset.desloc`. It should modify the
+   existing ruleset, add `Review policy`, set the native count to zero and disable
+   last-push approval, while preserving `CI gate`, strictness, thread resolution,
+   protected history and no bypass. Do not apply unrelated changes.
+4. Apply only that reviewed transition in the canonical remote workspace, then
+   read back ruleset `24293264` and the pull-request checks. Verify both required
+   contexts use integration ID `15368`, the current-head policy result is present,
+   and `require_extra_approval_for_unattributed_changes` is false. The provider
+   limitation below requires a separate check even after a clean Terraform plan.
+5. Inspect a full plan for remaining drift without applying other repositories'
+   changes. Verify the card ruleset is unchanged. Retain the workflow and its
+   event-driven/manual refreshes for later pushes and review changes.
+
+Rollback is a reviewed change setting `desloc_quota_review_policy_enabled` to
+`false` and applying the same existing resource. It restores the native current
+approval and last-push requirements while removing the required `Review policy`
+context. It preserves the other protections and never adds a bypass. Do this
+before removing or renaming the status-producing workflow.
+
+Repositories that continue using native review counts require one current
+approval from an eligible reviewer; those counts must not be raised to two when
+reconciling Terraform with GitHub.
 
 ## Extra Copilot approval after Terraform
 
@@ -93,6 +158,41 @@ local backup directory for each application. Rules without required approvals
 keep their zero count; archived repositories stay read-only and are reported.
 This step is required until the provider supports the
 extra-approval field; a Terraform plan alone cannot validate it.
+For a DESLOC-only transition, do not run the owner-wide mutation as an incidental
+cleanup: if the flag changed, save and reconcile only ruleset `24293264`, preserving
+its other fields, and verify the live result.
+
+Use this scoped command after the Terraform apply. It requires authenticated
+`gh` and `jq`, saves a private backup, changes only the extra-approval flag, and
+compares all writable settings after reading the rule back. An already-correct
+rule needs no write. Run it without concurrent ruleset edits.
+
+```sh
+set -eu
+umask 077
+backup_dir=$(mktemp -d "${TMPDIR:-/tmp}/desloc-review-policy.XXXXXX")
+endpoint=repos/ha-homelab/ha-desloc/rulesets/24293264
+settings='{name, target, enforcement, bypass_actors, conditions, rules}'
+gh api "$endpoint" > "$backup_dir/before.json"
+jq -e '.id == 24293264 and .source_type == "Repository" and
+  .source == "ha-homelab/ha-desloc" and
+  ([.rules[] | select(.type == "pull_request")] | length == 1)' \
+  "$backup_dir/before.json" > /dev/null
+jq -S "$settings" "$backup_dir/before.json" > "$backup_dir/settings.json"
+jq -S '(.rules[] | select(.type == "pull_request") |
+  .parameters.require_extra_approval_for_unattributed_changes) = false' \
+  "$backup_dir/settings.json" > "$backup_dir/desired.json"
+if ! cmp -s "$backup_dir/settings.json" "$backup_dir/desired.json"; then
+  gh api "$endpoint" > "$backup_dir/current.json"
+  jq -S "$settings" "$backup_dir/current.json" > "$backup_dir/current-settings.json"
+  cmp "$backup_dir/settings.json" "$backup_dir/current-settings.json"
+  gh api --method PUT "$endpoint" --input "$backup_dir/desired.json" > /dev/null
+fi
+gh api "$endpoint" > "$backup_dir/after.json"
+jq -S "$settings" "$backup_dir/after.json" > "$backup_dir/actual.json"
+cmp "$backup_dir/desired.json" "$backup_dir/actual.json"
+printf 'DESLOC review policy verified. Backup: %s\n' "$backup_dir"
+```
 
 ## Trust boundaries
 
