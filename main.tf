@@ -117,10 +117,11 @@ locals {
       topics           = ["desloc", "hacs", "home-assistant", "home-assistant-custom-component", "smart-lock", "python"]
     }
     ha-desloc-card = {
-      description = "Home Assistant Lovelace card for DESLOC locks: state, battery, Wi-Fi signal and confirmed unlock controls"
-      visibility  = "public"
-      has_issues  = true
-      topics      = ["desloc", "hacs", "home-assistant", "lovelace-custom-card", "smart-lock", "javascript"]
+      description      = "Home Assistant Lovelace card for DESLOC locks: state, battery, Wi-Fi signal and confirmed unlock controls"
+      visibility       = "public"
+      has_issues       = true
+      allow_auto_merge = true
+      topics           = ["desloc", "hacs", "home-assistant", "lovelace-custom-card", "smart-lock", "javascript"]
     }
     automations = {
       description = "Home Assistant automations: documented behavior, stable identities, and validated YAML"
@@ -435,6 +436,16 @@ resource "github_repository_ruleset" "desloc_card" {
       allowed_merge_methods             = ["squash"]
       required_approving_review_count   = contains(local.review_required_public_software_repositories, "ha-desloc-card") ? 1 : 0
       required_review_thread_resolution = true
+    }
+    dynamic "required_status_checks" {
+      for_each = contains(local.active_public_software_repositories, "ha-desloc-card") ? [true] : []
+      content {
+        strict_required_status_checks_policy = true
+        required_check {
+          context        = "CI gate"
+          integration_id = 15368
+        }
+      }
     }
   }
 }
