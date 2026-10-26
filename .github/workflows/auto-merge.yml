@@ -30,6 +30,10 @@ concurrency:
 jobs:
   auto-merge:
     # This reusable job reads GitHub metadata only and never executes PR source.
+    # Direct PR events only support the author allowed by pr-author below.
+    if: >-
+      (github.event_name != 'pull_request' && github.event_name != 'pull_request_review') ||
+      github.event.pull_request.user.login == '4alvit'
     uses: victron-venus/venus-os-ci-toolkit/.github/workflows/auto-merge.yml@8008fd1db4c410640e7abddfc8bc75833cdcd970
     with:
       pr-author: 4alvit
