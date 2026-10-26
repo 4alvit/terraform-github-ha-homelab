@@ -27,8 +27,10 @@ credentials. Public source is reviewed and published separately.
    cannot serialize this flag; see [the existing review-policy procedure](public-security.md#extra-copilot-approval-after-terraform).
    Do not apply unrelated organization-wide reconciliation changes.
 6. Accept only the scoped review-bot invitation with the existing metadata-only
-   `accept-adapter-reviewer.yml` workflow after this change is on `main`. Verify
-   effective Write permission. An invitation alone is not an accepted role.
+   `accept-adapter-reviewer.yml` workflow after this change is on `main`, with
+   the `repository` input set to `ha-homelab/ha-techo5-dot`. Verify effective
+   Write permission. An invitation alone is not an accepted role. The explicit
+   input keeps unrelated pending invitations outside this operation.
 7. Verify public visibility, protections, Actions defaults, dependency alerts and
    this repository's membership in the existing `BOT_PAT` allowlist. Finish with
    a fresh scoped plan showing no changes. A scoped no-op is not evidence that

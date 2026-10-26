@@ -2,6 +2,12 @@ name: Accept public adapter reviewer invitations
 
 on:
   workflow_dispatch:
+    inputs:
+      repository:
+        description: "Optional full repository name; blank accepts all managed invitations"
+        type: string
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -24,8 +30,10 @@ jobs:
         shell: python3 -I {0}
         env:
           GH_TOKEN: ${{ secrets.BOT_PAT }}
+          TARGET_REPOSITORY: ${{ inputs.repository }}
         run: |
           import json
+          import os
           import subprocess
 
           allowed = {
@@ -38,6 +46,12 @@ jobs:
               "ha-homelab/terraform-cloudflare-home-assistant",
               "ha-homelab/ha-techo5-dot",
           }
+
+          target = os.environ["TARGET_REPOSITORY"].strip()
+          if target:
+              if target not in allowed:
+                  raise RuntimeError("Target is not a Terraform-managed reviewer repository")
+              allowed = {target}
 
           def api(path, method="GET", paginate=False):
               command = ["gh", "api", "--method", method, path]
