@@ -36,6 +36,7 @@ jobs:
               "ha-homelab/sensing-evidence-kit",
               "ha-homelab/ruview-home-sensing",
               "ha-homelab/terraform-cloudflare-home-assistant",
+              "ha-homelab/ha-techo5-dot",
           }
 
           def api(path, method="GET", paginate=False):
