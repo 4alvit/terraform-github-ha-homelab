@@ -80,6 +80,11 @@ public versions while retaining deployment, geometry and device bindings private
   recordings, and household identifiers are excluded. Bootstrap its repository,
   default branch, vulnerability alerts, and Dependabot security updates first;
   publish reviewed source and verify the `CI gate` before applying its ruleset.
+- `ha-homelab/ha-techo5-dot` — public TECHO5 deployment and Home Assistant
+  integration guides for repurposed Echo Dot devices, with a separate wiki and
+  fresh public history. Firmware, device configuration, credentials, recordings
+  and household inventory remain private. See the [two-stage provisioning
+  procedure](docs/techo5-dot-provisioning.md).
 - `ha-homelab/ha-desloc-card` — public Lovelace dashboard card for the DESLOC
   integration, distributed separately through HACS. Auto-merge is enabled;
   its active public default branch requires up-to-date PRs and the GitHub Actions
