@@ -25,7 +25,15 @@ run "battery_card_bootstraps_public_protection_without_additional_access" {
   assert {
     condition = (
       github_repository_ruleset.jbd_bms_card.enforcement == "active" &&
-      length(github_repository_ruleset.jbd_bms_card.bypass_actors) == 0 &&
+      (
+        length([for actor in github_repository_ruleset.jbd_bms_card.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
+        alltrue([
+          for actor in github_repository_ruleset.jbd_bms_card.bypass_actors :
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          if actor.actor_type == local.owner_emergency_merge_actor.actor_type
+        ]) &&
+        length([for actor in github_repository_ruleset.jbd_bms_card.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
+      ) &&
       one(github_repository_ruleset.jbd_bms_card.rules).deletion &&
       one(github_repository_ruleset.jbd_bms_card.rules).non_fast_forward &&
       one(one(github_repository_ruleset.jbd_bms_card.rules).pull_request).required_approving_review_count == 1 &&

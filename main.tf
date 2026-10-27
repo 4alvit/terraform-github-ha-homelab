@@ -161,12 +161,19 @@ locals {
 }
 
 # Block publication to the new guide's default branch unless both source and
-# secret checks pass. No administrator bypass or extra human approval gate.
+# secret checks pass. The separate owner exception permits emergency PR merges.
 resource "github_repository_ruleset" "zac93_publication" {
   name        = "Protect main"
   repository  = github_repository.repositories["zac93-esp32"].name
   target      = "branch"
   enforcement = "active"
+
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
+  }
 
   conditions {
     ref_name {
@@ -205,6 +212,13 @@ resource "github_repository_ruleset" "tuya_esphome" {
   repository  = github_repository.repositories["ha-tuya-esphome"].name
   target      = "branch"
   enforcement = "active"
+
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
+  }
 
   conditions {
     ref_name {
@@ -285,6 +299,13 @@ resource "github_repository_ruleset" "zigbee_direct_button" {
   target      = "branch"
   enforcement = "active"
 
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -348,6 +369,13 @@ resource "github_repository_ruleset" "profile" {
     bypass_mode = "always"
   }
 
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -382,6 +410,13 @@ resource "github_repository_ruleset" "desloc" {
       actor_type  = "RepositoryRole"
       bypass_mode = "always"
     }
+  }
+
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
   }
 
   conditions {
@@ -437,6 +472,13 @@ resource "github_repository_ruleset" "desloc_card" {
     }
   }
 
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -483,6 +525,13 @@ resource "github_repository_ruleset" "echo_dot" {
     }
   }
 
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -524,6 +573,13 @@ resource "github_repository_ruleset" "echo_show_5" {
       actor_type  = "RepositoryRole"
       bypass_mode = "always"
     }
+  }
+
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
   }
 
   conditions {
@@ -569,6 +625,13 @@ resource "github_repository_ruleset" "slzb_06_recovery" {
     }
   }
 
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
+  }
+
   conditions {
     ref_name {
       include = ["~DEFAULT_BRANCH"]
@@ -610,6 +673,13 @@ resource "github_repository_ruleset" "rf_airbridge" {
       actor_type  = "RepositoryRole"
       bypass_mode = "always"
     }
+  }
+
+  # Owners may make an explicit emergency merge through an auditable PR.
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
   }
 
   conditions {
