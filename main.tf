@@ -123,6 +123,14 @@ locals {
       allow_auto_merge = true
       topics           = ["desloc", "hacs", "home-assistant", "lovelace-custom-card", "smart-lock", "javascript"]
     }
+    ha-jbd-bms-card = {
+      description            = "Colorful Home Assistant dashboard card for JBD battery telemetry and individual cell voltages, independent of Victron and Cerbo"
+      visibility             = "public"
+      has_issues             = true
+      enable_secret_scanning = true
+      allow_auto_merge       = true
+      topics                 = ["battery", "bms", "esphome", "hacs", "home-assistant", "jbd", "lovelace-custom-card", "mqtt"]
+    }
     automations = {
       description = "Home Assistant automations: documented behavior, stable identities, and validated YAML"
       visibility  = "private"
