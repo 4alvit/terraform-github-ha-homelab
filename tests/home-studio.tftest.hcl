@@ -9,7 +9,7 @@ mock_provider "github" {
   }
 }
 
-run "home_studio_requires_its_exact_ci_gate_without_bypass" {
+run "home_studio_requires_its_exact_ci_gate_with_owner_exception" {
   command = plan
 
   assert {
@@ -18,7 +18,15 @@ run "home_studio_requires_its_exact_ci_gate_without_bypass" {
       github_repository_ruleset.home_studio_ci.repository == "home-studio" &&
       github_repository_ruleset.home_studio_ci.target == "branch" &&
       github_repository_ruleset.home_studio_ci.enforcement == "active" &&
-      length(github_repository_ruleset.home_studio_ci.bypass_actors) == 0 &&
+      (
+        length([for actor in github_repository_ruleset.home_studio_ci.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
+        alltrue([
+          for actor in github_repository_ruleset.home_studio_ci.bypass_actors :
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          if actor.actor_type == local.owner_emergency_merge_actor.actor_type
+        ]) &&
+        length([for actor in github_repository_ruleset.home_studio_ci.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
+      ) &&
       one(one(github_repository_ruleset.home_studio_ci.conditions).ref_name).include == tolist(["~DEFAULT_BRANCH"]) &&
       length(one(one(github_repository_ruleset.home_studio_ci.conditions).ref_name).exclude) == 0 &&
       length(one(github_repository_ruleset.home_studio_ci.rules).pull_request) == 1 &&
@@ -28,7 +36,7 @@ run "home_studio_requires_its_exact_ci_gate_without_bypass" {
       one(one(one(github_repository_ruleset.home_studio_ci.rules).required_status_checks).required_check).context == "CI gate" &&
       one(one(one(github_repository_ruleset.home_studio_ci.rules).required_status_checks).required_check).integration_id == 15368
     )
-    error_message = "Home Studio must require its GitHub Actions CI gate and a pull request on the default branch, without bypasses or additional review requirements."
+    error_message = "Home Studio must require its GitHub Actions CI gate and a pull request on the default branch, with only the documented owner exception or additional review requirements."
   }
 }
 

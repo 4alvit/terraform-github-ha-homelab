@@ -21,7 +21,15 @@ run "public_adapters_require_review_checks_and_secret_protection" {
         one(one(repository.security_and_analysis).secret_scanning).status == "enabled" &&
         one(one(repository.security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
         github_repository_ruleset.public_adapters[name].enforcement == "active" &&
-        length(github_repository_ruleset.public_adapters[name].bypass_actors) == 0 &&
+        (
+          length([for actor in github_repository_ruleset.public_adapters[name].bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
+          alltrue([
+            for actor in github_repository_ruleset.public_adapters[name].bypass_actors :
+            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+            if actor.actor_type == local.owner_emergency_merge_actor.actor_type
+          ]) &&
+          length([for actor in github_repository_ruleset.public_adapters[name].bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
+        ) &&
         one(one(github_repository_ruleset.public_adapters[name].rules).pull_request).required_approving_review_count == 1 &&
         one(one(github_repository_ruleset.public_adapters[name].rules).pull_request).require_last_push_approval &&
         toset([for check in one(one(github_repository_ruleset.public_adapters[name].rules).required_status_checks).required_check : check.context]) == toset(["CI gate"]) &&

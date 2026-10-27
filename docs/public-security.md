@@ -1,10 +1,40 @@
 # Public software security policy
 
+## Emergency owner merges
+
+The owner policy approved on 2026-10-27 permits organization owners (`OrganizationAdmin`, with no actor ID)
+to bypass branch requirements **only while merging a pull request**. The shared
+`owner_emergency_merge_actor` in `admin-merge-policy.tf` is attached to each
+managed branch ruleset, including separate review and CI gates. A grant on only
+one ruleset cannot override another applicable rule. Existing unrelated actor
+exceptions are preserved; this change does not grant automation new privileges.
+
+Ordinary merges retain their existing reviews, CI, signatures and resolved-thread
+requirements. Use the exception deliberately for a necessary recovery, record the
+reason and available validation in the PR, and follow up on skipped checks. The
+new grant cannot authorize a direct push, force push, branch deletion or tag
+rewrite. Immutable release tags and deployment-environment approvals are unchanged.
+Archived repositories remain read-only; existing archived release gates receive
+no new actor. Repositories without enforced protection need no bypass grant.
+
+Apply only a reviewed plan against the canonical existing HCP state, then read
+back every applicable repository and inherited organization ruleset. An existing
+classic branch protection can still prohibit bypass; it needs its own reviewed
+state-managed update. Reconcile the unsupported extra Copilot approval field as
+described below, preserving the actor list. A merge of this source is not proof
+that HCP or GitHub has been updated.
+
+OpenSSF Best Practices and OpenSSF Scorecard are separate assessments. This
+exception is an explicit governance tradeoff: do not claim maximum branch
+protection or universal two-person review. Reassess the actual badge criteria
+and published evidence after any use that skips independent review. The
+presence of a badge does not approve an emergency merge.
+
 `public-security.tf` lists the public repositories reviewed for this rollout.
 Live metadata excludes private and archived repositories from new protections.
 The public `ha-desloc` integration requires pull requests, resolved review
 threads, protected history, and the strict `CI gate` check bound to GitHub Actions
-(integration ID `15368`), with no bypass actors. Its review policy is either one
+(integration ID `15368`), with the documented owner emergency exception. Its review policy is either one
 current native approval or the quota-aware `Review policy` check described below.
 An empty `public_security_enforcement_repositories` value cannot remove these
 protections. Live visibility and archive checks still apply.
@@ -18,7 +48,7 @@ restores one native approval, stale-approval dismissal, and approval after the
 last push. Enabling it replaces the native approval count with the strict
 `Review policy` check, also bound to
 GitHub Actions (`15368`). The existing `CI gate`, required pull requests, resolved
-threads, no-bypass policy, and deletion/force-push protection remain in force.
+threads, the owner emergency exception, and deletion/force-push protection remain in force.
 The card and all other repositories are unchanged.
 
 The trusted workflow normally requires an approval on the current pull-request
@@ -45,7 +75,7 @@ it evaluated. Binding to GitHub Actions identifies the app, not an individual
 workflow; changes to workflows and shared-workflow pins therefore remain part of
 the repository's review trust boundary.
 
-RF Airbridge also requires one current approval without bypass, plus its actual
+RF Airbridge also requires one current approval with the owner emergency exception, plus its actual
 `test` and `Compile ESPHome example` checks, bound to GitHub Actions
 (`15368`) and an up-to-date branch. Its shared metadata-only bot approval is
 opted into with `automerge`. Merge and verify that workflow before applying the
@@ -56,7 +86,7 @@ The other four audited public repositories preserve their current administrator
 bypass and review settings by default. Set
 `public_security_enforcement_repositories` only for repositories whose approval
 automation has been verified; activation enables the same current-review policy
-without administrator bypasses.
+with the documented owner emergency exception.
 This explicit activation does not affect the already active one-review policies
 for the button, Tuya conversion, and public Home Assistant repositories.
 Existing mandatory status checks and enabled auto-merge settings are preserved.
@@ -75,7 +105,7 @@ published check name from the reusable workflow. Keep these exact names in
 Terraform when reconciling the shared pipeline; the old unqualified names do
 not describe the checks that current pull requests produce. The existing
 one-review policy, stale approval dismissal, latest-push approval, resolved
-threads, and absence of bypass actors remain required.
+threads remain required for ordinary merges; the owner emergency exception is separate.
 
 `zac93-esp32` retains its enabled auto-merge setting. Auto-merge still waits for
 the repository's strict `check` and `secrets` checks, and adds no ruleset bypass.
@@ -92,7 +122,7 @@ New public repositories may set `enable_secret_scanning = true` in the declared
 inventory, so protection is enabled during creation without querying a repository
 that does not exist yet. The visibility guard still excludes private repositories.
 `zigbee-direct-button` uses this path and has its own ruleset with one
-current approval and no bypass. During initial provisioning, create only its
+current approval and the owner emergency exception. During initial provisioning, create only its
 repository, default branch, and security-update resources with a reviewed targeted
 plan; publish the initial source, then apply its ruleset and run a complete plan.
 The final configuration must include the ruleset. This bootstrap sequence does
@@ -101,7 +131,7 @@ not relax rules on any existing repository.
 `ha-jbd-bms-card` follows the same bootstrap sequence. Its final `Protect main`
 ruleset requires one current independent approval, resolved review threads,
 protected history and the strict `CI gate` check bound to GitHub Actions
-(`15368`), without bypass actors. Workflow tokens default to read-only and cannot
+(`15368`), with the documented owner emergency exception. Workflow tokens default to read-only and cannot
 approve pull requests. Provision its repository, default branch, vulnerability
 alerts, Dependabot updates and workflow permissions first; publish and verify
 the reviewed source with a GitHub Actions workflow that runs `CI gate` on both
@@ -140,7 +170,7 @@ For the quota-policy transition, use this order:
    `terraform plan -target=github_repository_ruleset.desloc`. It should modify the
    existing ruleset, add `Review policy`, set the native count to zero and disable
    last-push approval, while preserving `CI gate`, strictness, thread resolution,
-   protected history and no bypass. Do not apply unrelated changes.
+   protected history and the owner emergency exception. Do not apply unrelated changes.
 4. Apply only that reviewed transition in the canonical remote workspace, then
    read back ruleset `24293264` and the pull-request checks. Verify both required
    contexts use integration ID `15368`, the current-head policy result is present,
@@ -153,7 +183,7 @@ For the quota-policy transition, use this order:
 Rollback is a reviewed change setting `desloc_quota_review_policy_enabled` to
 `false` and applying the same existing resource. It restores the native current
 approval and last-push requirements while removing the required `Review policy`
-context. It preserves the other protections and never adds a bypass. Do this
+context. It preserves the other protections and retains the separately declared owner exception. Do this
 before removing or renaming the status-producing workflow.
 
 Repositories that continue using native review counts require one current
@@ -254,7 +284,7 @@ GitHub Actions (app 15368), with strict current-base checking. Its existing revi
 activation settings are preserved. The existing public `k3s-self-healing`
 repository has a dedicated default-branch policy with that same CI requirement,
 one current independent review, resolved review threads, and deletion/force-push
-protection without bypass actors. Nested release runs show `checks / CI gate`;
+protection with the documented owner emergency exception. Nested release runs show `checks / CI gate`;
 that display name is not used for the pull-request requirement.
 
 Apply only after reviewing the complete current plan and qualifying the public

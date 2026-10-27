@@ -44,7 +44,15 @@ run "public_cloudflare_module_has_scoped_review_and_no_deployment_data" {
       github_actions_variable.cloudflare_home_assistant_hosted.variable_name == "CI_RUNNER_MODE" &&
       github_repository_dependabot_security_updates.cloudflare_home_assistant.enabled &&
       github_repository_ruleset.cloudflare_home_assistant.enforcement == "active" &&
-      length(github_repository_ruleset.cloudflare_home_assistant.bypass_actors) == 0 &&
+      (
+        length([for actor in github_repository_ruleset.cloudflare_home_assistant.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
+        alltrue([
+          for actor in github_repository_ruleset.cloudflare_home_assistant.bypass_actors :
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          if actor.actor_type == local.owner_emergency_merge_actor.actor_type
+        ]) &&
+        length([for actor in github_repository_ruleset.cloudflare_home_assistant.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
+      ) &&
       one(github_repository_ruleset.cloudflare_home_assistant.rules).deletion &&
       one(github_repository_ruleset.cloudflare_home_assistant.rules).non_fast_forward &&
       one(one(github_repository_ruleset.cloudflare_home_assistant.rules).pull_request).required_approving_review_count == 1 &&
@@ -54,6 +62,6 @@ run "public_cloudflare_module_has_scoped_review_and_no_deployment_data" {
       one(one(github_repository_ruleset.cloudflare_home_assistant.rules).required_status_checks).strict_required_status_checks_policy &&
       { for check in one(one(github_repository_ruleset.cloudflare_home_assistant.rules).required_status_checks).required_check : check.context => check.integration_id } == { "CI gate" = 15368 }
     )
-    error_message = "The public module must retain independent current-head approval, the Actions CI gate, secret protection, hosted runners, and repository-scoped bot access without bypass."
+    error_message = "The public module must retain independent current-head approval, the Actions CI gate, secret protection, hosted runners, and repository-scoped bot access with the documented owner exception."
   }
 }

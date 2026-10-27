@@ -44,7 +44,15 @@ run "public_ruview_requires_hosted_ci_and_independent_review" {
       one(github_repository_ruleset.ruview_home_sensing_tags.rules).update &&
       one(github_repository_ruleset.ruview_home_sensing_tags.rules).deletion &&
       length(github_repository_ruleset.ruview_home_sensing_tags.bypass_actors) == 0 &&
-      length(github_repository_ruleset.ruview_home_sensing.bypass_actors) == 0 &&
+      (
+        length([for actor in github_repository_ruleset.ruview_home_sensing.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
+        alltrue([
+          for actor in github_repository_ruleset.ruview_home_sensing.bypass_actors :
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          if actor.actor_type == local.owner_emergency_merge_actor.actor_type
+        ]) &&
+        length([for actor in github_repository_ruleset.ruview_home_sensing.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
+      ) &&
       one(one(github_repository_ruleset.ruview_home_sensing.rules).pull_request).required_approving_review_count == 1 &&
       one(one(github_repository_ruleset.ruview_home_sensing.rules).pull_request).require_last_push_approval &&
       { for check in one(one(github_repository_ruleset.ruview_home_sensing.rules).required_status_checks).required_check : check.context => check.integration_id } == {
@@ -52,6 +60,6 @@ run "public_ruview_requires_hosted_ci_and_independent_review" {
         "CodeQL"         = 57789
       }
     )
-    error_message = "The public RuView implementation must use GitHub-hosted CI, secret protection, a read-only token and independent approval without bypasses."
+    error_message = "The public RuView implementation must use GitHub-hosted CI, secret protection, a read-only token and independent approval with only the documented owner exception."
   }
 }

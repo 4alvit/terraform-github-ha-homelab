@@ -18,12 +18,20 @@ run "public_tools_keep_signed_reviewed_source_and_secret_gates" {
         one(one(github_repository.repositories[name].security_and_analysis).secret_scanning).status == "enabled" &&
         one(one(github_repository.repositories[name].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
         github_repository_ruleset.community_tools[name].enforcement == "active" &&
-        length(github_repository_ruleset.community_tools[name].bypass_actors) == 0 &&
+        (
+          length([for actor in github_repository_ruleset.community_tools[name].bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
+          alltrue([
+            for actor in github_repository_ruleset.community_tools[name].bypass_actors :
+            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+            if actor.actor_type == local.owner_emergency_merge_actor.actor_type
+          ]) &&
+          length([for actor in github_repository_ruleset.community_tools[name].bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
+        ) &&
         one(github_repository_ruleset.community_tools[name].rules).required_signatures &&
         length(one(github_repository_ruleset.community_tools[name].rules).pull_request) == 1 &&
         toset([for check in one(one(github_repository_ruleset.community_tools[name].rules).required_status_checks).required_check : check.context]) == toset(["check", "secrets"])
       )
     ])
-    error_message = "Every public tool must retain source and full-history secret gates, signed commits, pull requests, and no bypass actors."
+    error_message = "Every public tool must retain source and full-history secret gates, signed commits, pull requests, and no additional bypass actors."
   }
 }
