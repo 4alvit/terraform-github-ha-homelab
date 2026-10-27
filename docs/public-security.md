@@ -104,7 +104,9 @@ protected history and the strict `CI gate` check bound to GitHub Actions
 (`15368`), without bypass actors. Workflow tokens default to read-only and cannot
 approve pull requests. Provision its repository, default branch, vulnerability
 alerts, Dependabot updates and workflow permissions first; publish and verify
-the reviewed source before applying `github_repository_ruleset.jbd_bms_card`.
+the reviewed source with a GitHub Actions workflow that runs `CI gate` on both
+pushes and pull requests. Wait for the initial `CI gate` run to succeed before
+applying `github_repository_ruleset.jbd_bms_card`.
 Inspect the full final plan for unrelated drift rather than applying it blindly.
 
 ## Rollout and state ownership
