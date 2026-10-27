@@ -246,3 +246,19 @@ resolved discussions; no bypass actor is added.
 
 Rollback: set `can_approve_pull_request_reviews` back to `false` and apply that
 resource. Remove the opt-in label to stop a pending individual approval.
+
+### Existing public CI gates
+
+The SLZB recovery policy requires the literal pull-request check `CI gate` from
+GitHub Actions (app 15368), with strict current-base checking. Its existing review
+activation settings are preserved. The existing public `k3s-self-healing`
+repository has a dedicated default-branch policy with that same CI requirement,
+one current independent review, resolved review threads, and deletion/force-push
+protection without bypass actors. Nested release runs show `checks / CI gate`;
+that display name is not used for the pull-request requirement.
+
+Apply only after reviewing the complete current plan and qualifying the public
+k3s metadata-only reviewer workflow. Read back the full rulesets afterward,
+including `require_extra_approval_for_unattributed_changes=false`, because the
+provider can reset that additional-approval flag. Source tests do not establish
+that the live policy is enabled.
