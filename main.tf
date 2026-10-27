@@ -492,6 +492,13 @@ resource "github_repository_ruleset" "echo_dot" {
       required_approving_review_count   = contains(local.review_required_public_software_repositories, "ha-echo-dot") ? 1 : 0
       required_review_thread_resolution = true
     }
+    required_status_checks {
+      strict_required_status_checks_policy = true
+      required_check {
+        context        = "CI gate"
+        integration_id = 15368
+      }
+    }
   }
 }
 

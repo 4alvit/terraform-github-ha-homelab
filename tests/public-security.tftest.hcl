@@ -8,6 +8,42 @@ mock_provider "github" {
   }
 }
 
+run "echo_dot_ci_is_required_before_review_activation" {
+  command = plan
+  variables {
+    public_security_enforcement_repositories = []
+  }
+  assert {
+    condition = try(
+      one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).strict_required_status_checks_policy &&
+      length(one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).required_check) == 1 &&
+      one(one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).required_check).context == "CI gate" &&
+      one(one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).required_check).integration_id == 15368,
+      false,
+    )
+    error_message = "Echo Dot must require its exact GitHub Actions CI gate on the current base even before optional review activation."
+  }
+}
+
+run "echo_dot_review_activation_preserves_ci" {
+  command = plan
+  variables {
+    public_security_enforcement_repositories = ["ha-echo-dot"]
+  }
+  assert {
+    condition = try(
+      one(one(github_repository_ruleset.echo_dot.rules).pull_request).required_approving_review_count == 1 &&
+      length(github_repository_ruleset.echo_dot.bypass_actors) == 0 &&
+      one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).strict_required_status_checks_policy &&
+      length(one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).required_check) == 1 &&
+      one(one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).required_check).context == "CI gate" &&
+      one(one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).required_check).integration_id == 15368,
+      false,
+    )
+    error_message = "Activating Echo Dot's independent review must retain the strict app-bound CI gate."
+  }
+}
+
 run "home_studio_closed_jobs_require_main_and_review" {
   command = plan
   assert {

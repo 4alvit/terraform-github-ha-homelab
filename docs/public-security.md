@@ -61,6 +61,13 @@ This explicit activation does not affect the already active one-review policies
 for the button, Tuya conversion, and public Home Assistant repositories.
 Existing mandatory status checks and enabled auto-merge settings are preserved.
 
+Echo Dot requires the strict `CI gate` check from GitHub Actions (`15368`)
+independently of optional review activation. A neutral review-bot status is not
+source validation. Its existing review activation and administrator-bypass
+settings remain unchanged by this CI requirement. After applying the reviewed
+Terraform plan, read back the default-branch rules and verify the check name,
+application ID and strictness before closing the enforcement issue.
+
 The public Home Assistant repository requires `CI gate`, `check-0 / validate`,
 and `check-0 / maintenance-runtime`, all bound to GitHub Actions (integration
 ID `15368`) with strict up-to-date checks. The `check-0 /` prefix is part of the
