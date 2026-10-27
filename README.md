@@ -85,6 +85,10 @@ public versions while retaining deployment, geometry and device bindings private
   fresh public history. Firmware, device configuration, credentials, recordings
   and household inventory remain private. See the [two-stage provisioning
   procedure](docs/techo5-dot-provisioning.md).
+- `ha-homelab/ha-jbd-bms-card` — public Lovelace card for JBD battery telemetry
+  and individual cell voltages. It uses Home Assistant entities and works without
+  Victron or Cerbo. Firmware, household entity mappings and credentials stay in
+  their existing projects or private installation configuration.
 - `ha-homelab/ha-desloc-card` — public Lovelace dashboard card for the DESLOC
   integration, distributed separately through HACS. Auto-merge is enabled;
   its active public default branch requires up-to-date PRs and the GitHub Actions
