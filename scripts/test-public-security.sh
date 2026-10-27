@@ -17,6 +17,8 @@ cp tests/cloudflare-home-assistant.tftest.hcl "$temporary/tests/"
 cp techo5-dot.tf "$temporary/"
 cp tests/techo5-dot.tftest.hcl "$temporary/tests/"
 cp tests/public-release-reviewers.tftest.hcl "$temporary/tests/"
+cp jbd-bms-card.tf "$temporary/"
+cp tests/jbd-bms-card.tftest.hcl "$temporary/tests/"
 if [[ -f .terraform.lock.hcl ]]; then
   cp .terraform.lock.hcl "$temporary/"
 fi

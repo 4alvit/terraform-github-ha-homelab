@@ -98,6 +98,15 @@ plan; publish the initial source, then apply its ruleset and run a complete plan
 The final configuration must include the ruleset. This bootstrap sequence does
 not relax rules on any existing repository.
 
+`ha-jbd-bms-card` follows the same bootstrap sequence. Its final `Protect main`
+ruleset requires one current independent approval, resolved review threads,
+protected history and the strict `CI gate` check bound to GitHub Actions
+(`15368`), without bypass actors. Workflow tokens default to read-only and cannot
+approve pull requests. Provision its repository, default branch, vulnerability
+alerts, Dependabot updates and workflow permissions first; publish and verify
+the reviewed source before applying `github_repository_ruleset.jbd_bms_card`.
+Inspect the full final plan for unrelated drift rather than applying it blindly.
+
 ## Rollout and state ownership
 
 Merge the application repair PRs after their required checks succeed, then
