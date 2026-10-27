@@ -33,7 +33,7 @@ resource "github_repository_ruleset" "jbd_bms_card" {
     }
   }
 
-  depends_on = [github_branch_default.main]
+  depends_on = [github_branch_default.main["ha-jbd-bms-card"]]
 }
 
 resource "github_workflow_repository_permissions" "jbd_bms_card" {
