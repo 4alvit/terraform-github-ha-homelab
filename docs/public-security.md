@@ -262,3 +262,8 @@ k3s metadata-only reviewer workflow. Read back the full rulesets afterward,
 including `require_extra_approval_for_unattributed_changes=false`, because the
 provider can reset that additional-approval flag. Source tests do not establish
 that the live policy is enabled.
+
+The public JBD battery card is included in the existing scoped reviewer
+allowlist. Its bot receives repository Write permission so an independent
+approval can satisfy protection; the grant adds neither administration nor
+rule bypass, and does not change the one-review or CI requirements.

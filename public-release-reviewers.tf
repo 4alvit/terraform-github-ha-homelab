@@ -7,6 +7,7 @@ locals {
     "ha-echo-dot",
     "ha-echo-show-5",
     "ha-entity-migrations",
+    "ha-jbd-bms-card",
     "ha-meter-contracts",
     "ha-scenario-tests",
     "home-assistant",
