@@ -44,6 +44,49 @@ run "echo_dot_review_activation_preserves_ci" {
   }
 }
 
+run "slzb_ci_is_required_before_review_activation" {
+  command = plan
+  variables {
+    public_security_enforcement_repositories = []
+  }
+  assert {
+    condition = try(
+      one(one(github_repository_ruleset.slzb_06_recovery.rules).pull_request).required_approving_review_count == 0 &&
+      one(one(github_repository_ruleset.slzb_06_recovery.rules).pull_request).required_review_thread_resolution &&
+      length(github_repository_ruleset.slzb_06_recovery.bypass_actors) == 1 &&
+      one(one(github_repository_ruleset.slzb_06_recovery.rules).required_status_checks).strict_required_status_checks_policy &&
+      length(one(one(github_repository_ruleset.slzb_06_recovery.rules).required_status_checks).required_check) == 1 &&
+      one(one(one(github_repository_ruleset.slzb_06_recovery.rules).required_status_checks).required_check).context == "CI gate" &&
+      one(one(one(github_repository_ruleset.slzb_06_recovery.rules).required_status_checks).required_check).integration_id == 15368,
+      false,
+    )
+    error_message = "SLZB must require its exact app-bound CI gate without changing existing optional review activation."
+  }
+}
+
+run "public_k3s_requires_review_and_exact_ci_without_bypass" {
+  command = plan
+  assert {
+    condition = try(
+      github_repository_ruleset.public_k3s.enforcement == "active" &&
+      length(github_repository_ruleset.public_k3s.bypass_actors) == 0 &&
+      toset(one(one(github_repository_ruleset.public_k3s.conditions).ref_name).include) == toset(["~DEFAULT_BRANCH"]) &&
+      one(github_repository_ruleset.public_k3s.rules).deletion &&
+      one(github_repository_ruleset.public_k3s.rules).non_fast_forward &&
+      one(one(github_repository_ruleset.public_k3s.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.public_k3s.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.public_k3s.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.public_k3s.rules).pull_request).required_review_thread_resolution &&
+      one(one(github_repository_ruleset.public_k3s.rules).required_status_checks).strict_required_status_checks_policy &&
+      length(one(one(github_repository_ruleset.public_k3s.rules).required_status_checks).required_check) == 1 &&
+      one(one(one(github_repository_ruleset.public_k3s.rules).required_status_checks).required_check).context == "CI gate" &&
+      one(one(one(github_repository_ruleset.public_k3s.rules).required_status_checks).required_check).integration_id == 15368,
+      false,
+    )
+    error_message = "Public k3s source must require one current review and its actual Actions CI gate while protecting branch history."
+  }
+}
+
 run "home_studio_closed_jobs_require_main_and_review" {
   command = plan
   assert {
