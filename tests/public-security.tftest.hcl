@@ -37,7 +37,7 @@ run "echo_dot_review_activation_preserves_ci" {
         length([for actor in github_repository_ruleset.echo_dot.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.echo_dot.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.echo_dot.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -65,7 +65,7 @@ run "slzb_ci_is_required_before_review_activation" {
         length([for actor in github_repository_ruleset.slzb_06_recovery.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.slzb_06_recovery.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.slzb_06_recovery.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
@@ -89,7 +89,7 @@ run "public_k3s_requires_review_and_exact_ci_with_owner_exception" {
         length([for actor in github_repository_ruleset.public_k3s.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.public_k3s.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.public_k3s.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -139,7 +139,7 @@ run "zac93_requires_source_and_secret_checks_with_owner_exception" {
         length([for actor in github_repository_ruleset.zac93_publication.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.zac93_publication.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.zac93_publication.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -167,7 +167,7 @@ run "new_echomuse_repository_requires_secrets_review_and_ci_protection" {
         length([for actor in github_repository_ruleset.echomuse.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.echomuse.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.echomuse.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -200,7 +200,7 @@ run "new_capture_repository_requires_current_review_and_ci" {
         length([for actor in github_repository_ruleset.lg_tv_capture.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.lg_tv_capture.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.lg_tv_capture.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -211,7 +211,7 @@ run "new_capture_repository_requires_current_review_and_ci" {
       one(one(github_repository_ruleset.lg_tv_capture.rules).pull_request).required_review_thread_resolution &&
       toset([for check in one(one(github_repository_ruleset.lg_tv_capture.rules).required_status_checks).required_check : check.context]) == toset(["CI gate"])
     )
-    error_message = "The new capture repository must protect secrets and require its CI gate with one current review and the owner emergency exception."
+    error_message = "The new capture repository must protect secrets and require its CI gate with one current review and the owner bypass."
   }
 }
 
@@ -256,7 +256,7 @@ run "existing_public_rules_require_one_current_review" {
           length([for actor in policy.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
           alltrue([
             for actor in policy.bypass_actors :
-            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
             if actor.actor_type == local.owner_emergency_merge_actor.actor_type
           ]) &&
           length([for actor in policy.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -285,7 +285,7 @@ run "desloc_native_review_fallback_keeps_current_review_and_ci" {
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.desloc.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -303,7 +303,7 @@ run "desloc_native_review_fallback_keeps_current_review_and_ci" {
         check.context == "CI gate" && check.integration_id == 15368
       ])
     )
-    error_message = "Disabling the quota policy must restore one current native approval and retain the strict GitHub Actions CI gate, with the owner emergency exception."
+    error_message = "Disabling the quota policy must restore one current native approval and retain the strict GitHub Actions CI gate, with the owner bypass."
   }
 }
 
@@ -320,7 +320,7 @@ run "empty_optional_activation_cannot_disable_desloc_policy" {
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.desloc.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -346,7 +346,7 @@ run "desloc_quota_policy_requires_both_trusted_checks_with_owner_exception" {
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.desloc.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -366,7 +366,7 @@ run "desloc_quota_policy_requires_both_trusted_checks_with_owner_exception" {
         check.integration_id == 15368
       ])
     )
-    error_message = "The DESLOC quota policy must atomically replace native approvals with the strict GitHub Actions Review policy check while preserving CI, PRs, threads, history protection and the owner emergency exception."
+    error_message = "The DESLOC quota policy must atomically replace native approvals with the strict GitHub Actions Review policy check while preserving CI, PRs, threads, history protection and the owner bypass."
   }
 }
 
@@ -389,7 +389,7 @@ run "desloc_quota_policy_does_not_change_other_review_policies" {
           length([for actor in policy.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
           alltrue([
             for actor in policy.bypass_actors :
-            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
             if actor.actor_type == local.owner_emergency_merge_actor.actor_type
           ]) &&
           length([for actor in policy.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -420,7 +420,7 @@ run "desloc_quota_policy_preserves_card_defaults" {
         length([for actor in github_repository_ruleset.desloc_card.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.desloc_card.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.desloc_card.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
@@ -458,7 +458,7 @@ run "private_repository_preserves_existing_policy" {
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.desloc.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
@@ -495,7 +495,7 @@ run "archived_repository_preserves_existing_policy" {
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.desloc.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
@@ -537,7 +537,7 @@ run "capture_bot_access_grants_only_repository_write" {
         length([for actor in github_repository_ruleset.lg_tv_capture.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.lg_tv_capture.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.lg_tv_capture.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -605,7 +605,7 @@ run "profile_and_private_repository_settings_are_unchanged" {
         length([for actor in github_repository_ruleset.profile.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.profile.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.profile.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
@@ -629,7 +629,7 @@ run "new_public_button_repository_has_protections_without_live_lookup" {
         length([for actor in github_repository_ruleset.zigbee_direct_button.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.zigbee_direct_button.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.zigbee_direct_button.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -656,7 +656,7 @@ run "new_public_conversion_repository_has_protections_without_live_lookup" {
         length([for actor in github_repository_ruleset.tuya_esphome.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.tuya_esphome.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.tuya_esphome.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -710,7 +710,7 @@ run "public_home_assistant_protects_reviewed_main" {
         length([for actor in github_repository_ruleset.home_assistant_public.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.home_assistant_public.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.home_assistant_public.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -747,7 +747,7 @@ run "unactivated_public_reviews_preserve_existing_bypasses" {
           length([for actor in policy.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
           alltrue([
             for actor in policy.bypass_actors :
-            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
             if actor.actor_type == local.owner_emergency_merge_actor.actor_type
           ]) &&
           length([for actor in policy.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
@@ -851,7 +851,7 @@ run "rf_airbridge_requires_current_review_and_actual_ci_by_default" {
         length([for actor in github_repository_ruleset.rf_airbridge.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.rf_airbridge.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.rf_airbridge.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
@@ -883,7 +883,7 @@ run "rf_airbridge_private_keeps_existing_policy" {
         length([for actor in github_repository_ruleset.rf_airbridge.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.rf_airbridge.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.rf_airbridge.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
@@ -910,7 +910,7 @@ run "rf_airbridge_archived_keeps_existing_policy" {
         length([for actor in github_repository_ruleset.rf_airbridge.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.rf_airbridge.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.rf_airbridge.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
@@ -922,14 +922,14 @@ run "rf_airbridge_archived_keeps_existing_policy" {
   }
 }
 
-run "emergency_merge_is_limited_to_the_owner_and_pull_requests" {
+run "permanent_branch_bypass_is_limited_to_the_owner" {
   command = plan
   assert {
     condition = (
       local.owner_emergency_merge_actor.actor_type == "OrganizationAdmin" &&
       local.owner_emergency_merge_actor.actor_id == null &&
-      local.owner_emergency_merge_actor.bypass_mode == "pull_request"
+      local.owner_emergency_merge_actor.bypass_mode == "always"
     )
-    error_message = "Only the declared owner may use the emergency PR exception; repository roles, automation and direct pushes are not added."
+    error_message = "Only organization owners receive the permanent branch bypass; repository roles and automation receive no additional grant."
   }
 }
