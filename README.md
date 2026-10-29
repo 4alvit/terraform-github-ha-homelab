@@ -281,6 +281,14 @@ The provider lock file is committed for reproducibility. Repository visibility i
 also verified against GitHub after remote apply. Every infrastructure change should
 end with a fresh remote plan showing no unintended changes.
 
+Every managed repository enables `delete_branch_on_merge = true`. GitHub removes
+eligible pull-request head branches after merge, subject to branch protection and
+rulesets; local branches, worktrees and unmerged work are unaffected. The mocked
+policy test in `scripts/test-public-security.sh` covers both repository maps and
+the standalone resources. Merging Terraform source does not apply it: use the
+canonical workspace and verify the live setting after apply. Manual GitHub
+changes or repositories outside this workspace's inventory can still drift.
+
 ## License
 
 [MIT](LICENSE). This is an independent homelab project, not an official Home Assistant project.
