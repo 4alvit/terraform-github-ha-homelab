@@ -25,7 +25,7 @@ run "public_adapters_require_review_checks_and_secret_protection" {
           length([for actor in github_repository_ruleset.public_adapters[name].bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
           alltrue([
             for actor in github_repository_ruleset.public_adapters[name].bypass_actors :
-            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+            coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
             if actor.actor_type == local.owner_emergency_merge_actor.actor_type
           ]) &&
           length([for actor in github_repository_ruleset.public_adapters[name].bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0

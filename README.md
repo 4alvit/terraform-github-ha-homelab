@@ -44,7 +44,7 @@ public versions while retaining deployment, geometry and device bindings private
 - `ha-homelab/zac93-esp32` — illustrated ZAC93 bridge guide for ESP32-WROOM
   and ESP32-S3, with ESPHome configuration, Home Assistant setup and diagnostics.
   Local hooks and CI reject private artifacts and secrets; the default branch
-  requires both `check` and `secrets` with the owner emergency exception. Wi-Fi/API credentials,
+  requires both `check` and `secrets` with the owner bypass. Wi-Fi/API credentials,
   firmware builds and Z-Wave controller backups remain private.
 
 - `ha-homelab/ha-lg-tv-capture` — public, MIT-licensed LG webOS TV screen capture
@@ -117,7 +117,7 @@ defaults. Organization creation and avatar selection are outside this configurat
 `home-studio.tf` looks up the existing public `ha-homelab/home-studio`
 repository and manages only its default-branch CI ruleset. Pull requests must
 pass the exact `CI gate` check from GitHub Actions (integration `15368`), with
-strict up-to-date checks and the owner emergency exception. The gate aggregates Home Studio's
+strict up-to-date checks and the owner bypass. The gate aggregates Home Studio's
 required package, browser, installation and workflow checks. No additional review
 count or merge-method restriction is introduced. Repository settings, collaborators,
 secrets and release environments are outside this resource's ownership.
@@ -202,7 +202,7 @@ GitHub Free does not support enforced private-repository rulesets; see
 The public `.github` profile retains its existing active protection and
 administrator bypass. Its Terraform resource address and remote ID are unchanged.
 The public `ha-desloc` integration requires pull requests, resolved review threads,
-protected history, and the strict GitHub Actions `CI gate`, with the owner emergency exception.
+protected history, and the strict GitHub Actions `CI gate`, with the owner bypass.
 The `desloc_quota_review_policy_enabled` transition replaces its native approval
 count with a required `Review policy` check after that workflow has been verified.
 The workflow requires a current-head approval except for a verified CodeRabbit
@@ -236,7 +236,7 @@ Provision `ha-lg-tv-capture` with its generated README, secret scanning, push
 protection, Dependabot and read-only workflow-token defaults. Publish the reviewed
 source and MIT license through a pull request, then activate
 `github_repository_ruleset.lg_tv_capture` when the source workflow provides
-`CI gate`. The ruleset requires one current approval with the owner emergency exception and allows
+`CI gate`. The ruleset requires one current approval with the owner bypass and allows
 only squash merging. Auto-merge is available after the required checks and review.
 Release workflows and source files are owned by the capture repository.
 
@@ -245,7 +245,7 @@ publication through `github_actions_variable.lg_tv_capture_release_publication`.
 It depends on the protected version tags and the `release` environment, whose
 deployment policy allows only `main` and whose reviewer is `4alvit`. The environment
 follows the existing single-maintainer policy: the owner may approve a promotion
-they triggered and administrators may bypass environment approval. Branch rules permit the owner emergency PR exception; version-tag rulesets have no bypass actors. No production environment is created.
+they triggered and administrators may bypass environment approval. Branch rules permit the owner bypass; version-tag rulesets have no bypass actors. No production environment is created.
 
 Review a targeted remote plan for the new repository's resources during this
 bootstrap; do not apply unrelated workspace drift. Finish with a new remote plan
@@ -323,7 +323,7 @@ The [community overview](https://github.com/ha-homelab/.github/tree/main/communi
 explains how the tools relate and records the remaining hardware work.
 
 These repositories require signed commits and pull requests with successful
-`check` and `secrets` checks; the owner emergency PR exception remains available. Secret scanning and
+`check` and `secrets` checks; the owner bypass remains available. Secret scanning and
 push protection are enabled. The initial repositories are adopted through
 explicit import blocks; do not create duplicate state ownership. ZAC93 also
 opts into its documentation wiki without changing radio or firmware settings.
@@ -345,7 +345,7 @@ The [disclosed secure-provider profile](docs/SECURE_PROVIDER.md) builds a review
 
 `ruview-home-sensing.tf` creates [ha-homelab/ruview-home-sensing](https://github.com/ha-homelab/ruview-home-sensing) as an independent public repository. Publication uses reviewed generic source and a new Git history; no existing repository changes visibility. Installation configuration, device identities, credentials, observations and floor plans are excluded from this repository.
 
-The initial repository has secret scanning and push protection, vulnerability alerts, Dependabot security updates, read-only default workflow permissions, and approval support for explicitly authorized metadata workflows. `CI_RUNNER_MODE=github` overrides organization routing so shared workflows use GitHub-hosted runners. The project also checks that policy before launching its shared validation. Main requires one current independent approval, resolved review threads, the `Public CI gate` check from GitHub Actions, and the separate `CodeQL` result from GitHub Advanced Security, with the owner emergency PR exception. A successful SARIF upload does not bypass security findings. Automatic merging is enabled, but both validation checks and current independent approval remain mandatory. Version tags matching `v*` cannot be updated or deleted; new release tags remain permitted.
+The initial repository has secret scanning and push protection, vulnerability alerts, Dependabot security updates, read-only default workflow permissions, and approval support for explicitly authorized metadata workflows. `CI_RUNNER_MODE=github` overrides organization routing so shared workflows use GitHub-hosted runners. The project also checks that policy before launching its shared validation. Main requires one current independent approval, resolved review threads, the `Public CI gate` check from GitHub Actions, and the separate `CodeQL` result from GitHub Advanced Security, with the owner bypass. A successful SARIF upload does not bypass security findings. Automatic merging is enabled, but both validation checks and current independent approval remain mandatory. Version tags matching `v*` cannot be updated or deleted; new release tags remain permitted.
 
 Provisioning is a reviewed targeted HCP plan containing only the twelve RuView resources (the runner variable is `ruview_home_sensing_hosted` and the version-tag ruleset is `ruview_home_sensing_tags`). Check for unexpected addresses or non-create actions before the first apply. Existing organization repositories are outside this bootstrap scope. Repository files and application releases remain owned by their source PRs.
 
@@ -371,6 +371,6 @@ membership cannot provide an approval that satisfies protected branch rules. Eac
 remain public and active. The grant does not change required CI, approval counts,
 last-push review, secret access, runner selection, or rule bypasses.
 
-## Emergency merge authority
+## Permanent owner bypass
 
-Organization owners can use a [documented emergency exception](docs/public-security.md#emergency-owner-merges) through a pull request when necessary. Ordinary review and CI requirements remain; this grant does not authorize direct pushes or tag rewrites. Terraform must be applied to the canonical state and live rules verified before relying on it.
+Organization owners have a [documented permanent branch bypass](docs/public-security.md#permanent-owner-bypass) for pull-request merges, direct pushes, force updates and branch deletion. Ordinary review and CI requirements remain for other actors, and this grant leaves immutable release tags and deployment approvals unchanged. Terraform must be applied to the canonical state and live rules verified before relying on it.

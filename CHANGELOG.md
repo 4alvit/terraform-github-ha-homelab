@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Make the organization-owner branch bypass permanent, including direct pushes,
+  force updates and branch deletion. Preserve all other actors, ordinary review
+  and CI requirements, immutable release tags, and deployment approvals.
+- Reconcile this policy only against the canonical HCP state, review the plan,
+  and verify the live rules after applying it.
+
 ## [0.2.0] - 2026-10-17
 
 ### Security

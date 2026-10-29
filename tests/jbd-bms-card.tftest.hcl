@@ -29,7 +29,7 @@ run "battery_card_bootstraps_public_protection_without_additional_access" {
         length([for actor in github_repository_ruleset.jbd_bms_card.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
           for actor in github_repository_ruleset.jbd_bms_card.bypass_actors :
-          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "pull_request"
+          coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
         length([for actor in github_repository_ruleset.jbd_bms_card.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0

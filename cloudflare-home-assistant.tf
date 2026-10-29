@@ -96,7 +96,7 @@ resource "github_repository_ruleset" "cloudflare_home_assistant" {
   target      = "branch"
   enforcement = "active"
 
-  # Owners may make an explicit emergency merge through an auditable PR.
+  # Organization owners may bypass this branch rule for maintenance.
   bypass_actors {
     actor_id    = local.owner_emergency_merge_actor.actor_id
     actor_type  = local.owner_emergency_merge_actor.actor_type
