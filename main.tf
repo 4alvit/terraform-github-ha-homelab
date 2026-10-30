@@ -287,6 +287,8 @@ resource "github_repository" "repositories" {
 
   lifecycle {
     prevent_destroy = true
+    # Pages has a dedicated owner; do not also reconcile its nested legacy block.
+    ignore_changes = [pages]
   }
 }
 
