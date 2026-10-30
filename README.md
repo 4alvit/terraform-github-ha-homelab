@@ -269,6 +269,28 @@ check out source, approve PRs, or bypass protections. Re-running is safe: alread
 accepted invitations are no longer returned. Verify the bot has `write`
 permission, then rerun each repository's normal review workflow if necessary.
 
+## Browser firmware installer
+
+`esp-web-installer.tf` owns the GitHub Pages configuration for the public
+[`zac93-esp32`](https://github.com/ha-homelab/zac93-esp32) USB installer. Pages
+uses the **GitHub Actions** build type. Firmware compilation, release checks and
+site deployment remain in the firmware repository; this workspace does not
+build or flash devices.
+
+The repository resource ignores its legacy nested `pages` attribute because
+`github_repository_pages.zac93_installer` owns that setting independently. This
+ignore rule applies to the shared repository map: any future Pages site in that
+map needs its own explicit resource and reviewed plan, rather than a nested
+`pages` block. It does not create or enable Pages for other repositories.
+
+Review the complete remote plan before applying. Initial setup should add only
+the ZAC93 Pages resource, without changing repository visibility, access or
+branch rules. Then run the firmware repository's documented web-firmware
+workflow with deployment explicitly enabled. Verify the published version,
+board profiles, download checksums and HTTPS page. Creating Pages alone does
+not publish firmware. A browser installation still requires the operator to
+choose a board and grant access to its USB serial port.
+
 ## Validation
 
 ```sh
