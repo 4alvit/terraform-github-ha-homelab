@@ -1,5 +1,5 @@
 variable "public_security_enforcement_repositories" {
-  description = "Additional public repositories whose approval automation has been verified and whose stricter review policy is explicitly activated. DESLOC and RF Airbridge are mandatory; existing administrator bypasses remain on other repositories until activation."
+  description = "Legacy activation input retained for existing workspace settings. Review policy is mandatory for all active audited public software repositories; private and archived repositories remain excluded."
   type        = set(string)
   default     = []
 
@@ -46,7 +46,7 @@ locals {
 locals {
   # These review and CI requirements are established policy, not an optional
   # workspace setting. The live public/active guard still applies below.
-  mandatory_review_public_software_repositories = toset(["ha-desloc", "rf-airbridge"])
+  mandatory_review_public_software_repositories = local.public_software_repositories
 
   review_required_public_software_repositories = setintersection(
     local.active_public_software_repositories,

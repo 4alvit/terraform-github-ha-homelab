@@ -8,20 +8,27 @@ mock_provider "github" {
   }
 }
 
-run "echo_dot_ci_is_required_before_review_activation" {
+run "echo_dot_review_is_required_with_empty_optional_activation" {
   command = plan
   variables {
     public_security_enforcement_repositories = []
   }
   assert {
     condition = try(
+      one(one(github_repository_ruleset.echo_dot.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.echo_dot.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.echo_dot.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.echo_dot.rules).pull_request).required_review_thread_resolution &&
+      length(github_repository_ruleset.echo_dot.bypass_actors) == 1 &&
+      one(github_repository_ruleset.echo_dot.bypass_actors).actor_type == local.owner_emergency_merge_actor.actor_type &&
+      one(github_repository_ruleset.echo_dot.bypass_actors).bypass_mode == "always" &&
       one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).strict_required_status_checks_policy &&
       length(one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).required_check) == 1 &&
       one(one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).required_check).context == "CI gate" &&
       one(one(one(github_repository_ruleset.echo_dot.rules).required_status_checks).required_check).integration_id == 15368,
       false,
     )
-    error_message = "Echo Dot must require its exact GitHub Actions CI gate on the current base even before optional review activation."
+    error_message = "An empty optional activation list must retain one current Echo Dot review, its exact CI gate, and only the owner bypass."
   }
 }
 
@@ -52,14 +59,14 @@ run "echo_dot_review_activation_preserves_ci" {
   }
 }
 
-run "slzb_ci_is_required_before_review_activation" {
+run "slzb_review_is_required_with_empty_optional_activation" {
   command = plan
   variables {
     public_security_enforcement_repositories = []
   }
   assert {
     condition = try(
-      one(one(github_repository_ruleset.slzb_06_recovery.rules).pull_request).required_approving_review_count == 0 &&
+      one(one(github_repository_ruleset.slzb_06_recovery.rules).pull_request).required_approving_review_count == 1 &&
       one(one(github_repository_ruleset.slzb_06_recovery.rules).pull_request).required_review_thread_resolution &&
       (
         length([for actor in github_repository_ruleset.slzb_06_recovery.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
@@ -68,7 +75,7 @@ run "slzb_ci_is_required_before_review_activation" {
           coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
-        length([for actor in github_repository_ruleset.slzb_06_recovery.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
+        length([for actor in github_repository_ruleset.slzb_06_recovery.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
       ) &&
       one(one(github_repository_ruleset.slzb_06_recovery.rules).required_status_checks).strict_required_status_checks_policy &&
       length(one(one(github_repository_ruleset.slzb_06_recovery.rules).required_status_checks).required_check) == 1 &&
@@ -76,7 +83,7 @@ run "slzb_ci_is_required_before_review_activation" {
       one(one(one(github_repository_ruleset.slzb_06_recovery.rules).required_status_checks).required_check).integration_id == 15368,
       false,
     )
-    error_message = "SLZB must require its exact app-bound CI gate without changing existing optional review activation."
+    error_message = "SLZB must retain one current review and its exact app-bound CI gate with only the owner bypass, even when optional activation is empty."
   }
 }
 
@@ -315,7 +322,7 @@ run "empty_optional_activation_cannot_disable_desloc_policy" {
   }
   assert {
     condition = (
-      local.review_required_public_software_repositories == toset(["ha-desloc", "rf-airbridge"]) &&
+      local.review_required_public_software_repositories == local.public_software_repositories &&
       (
         length([for actor in github_repository_ruleset.desloc.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&
         alltrue([
@@ -423,11 +430,11 @@ run "desloc_quota_policy_preserves_card_defaults" {
           coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
-        length([for actor in github_repository_ruleset.desloc_card.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
+        length([for actor in github_repository_ruleset.desloc_card.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
       ) &&
-      one(one(github_repository_ruleset.desloc_card.rules).pull_request).required_approving_review_count == 0 &&
-      !one(one(github_repository_ruleset.desloc_card.rules).pull_request).require_last_push_approval &&
-      !one(one(github_repository_ruleset.desloc_card.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.desloc_card.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.desloc_card.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.desloc_card.rules).pull_request).dismiss_stale_reviews_on_push &&
       one(one(github_repository_ruleset.desloc_card.rules).pull_request).required_review_thread_resolution &&
       one(one(github_repository_ruleset.desloc_card.rules).required_status_checks).strict_required_status_checks_policy &&
       toset([for check in one(one(github_repository_ruleset.desloc_card.rules).required_status_checks).required_check : check.context]) == toset(["CI gate"])
@@ -733,8 +740,11 @@ run "public_home_assistant_protects_reviewed_main" {
   }
 }
 
-run "unactivated_public_reviews_preserve_existing_bypasses" {
+run "empty_activation_cannot_disable_four_public_review_policies" {
   command = plan
+  variables {
+    public_security_enforcement_repositories = []
+  }
   assert {
     condition = alltrue([
       for policy in [
@@ -750,14 +760,18 @@ run "unactivated_public_reviews_preserve_existing_bypasses" {
             coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
             if actor.actor_type == local.owner_emergency_merge_actor.actor_type
           ]) &&
-          length([for actor in policy.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
+          length([for actor in policy.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
         ) &&
-        one(one(policy.rules).pull_request).required_approving_review_count == 0 &&
-        !one(one(policy.rules).pull_request).require_last_push_approval &&
-        !one(one(policy.rules).pull_request).dismiss_stale_reviews_on_push
+        one(one(policy.rules).pull_request).required_approving_review_count == 1 &&
+        one(one(policy.rules).pull_request).require_last_push_approval &&
+        one(one(policy.rules).pull_request).dismiss_stale_reviews_on_push &&
+        one(one(policy.rules).required_status_checks).strict_required_status_checks_policy &&
+        length(one(one(policy.rules).required_status_checks).required_check) == 1 &&
+        one(one(one(policy.rules).required_status_checks).required_check).context == "CI gate" &&
+        one(one(one(policy.rules).required_status_checks).required_check).integration_id == 15368
       )
     ])
-    error_message = "Other repositories' reviews and bypasses must remain until explicitly activated."
+    error_message = "All four public projects must retain one current independent review and only the owner bypass even with an empty legacy activation list."
   }
 }
 
@@ -931,5 +945,21 @@ run "permanent_branch_bypass_is_limited_to_the_owner" {
       local.owner_emergency_merge_actor.bypass_mode == "always"
     )
     error_message = "Only organization owners receive the permanent branch bypass; repository roles and automation receive no additional grant."
+  }
+}
+
+run "desloc_wiki_homepages_preserve_published_routes" {
+  command = plan
+  assert {
+    condition = (
+      github_repository.repositories["ha-desloc"].homepage_url == "https://ha-homelab.github.io/ha-desloc/" &&
+      github_repository.repositories["ha-desloc-card"].homepage_url == "https://ha-homelab.github.io/ha-desloc/#dashboard" &&
+      alltrue([
+        for name, repository in github_repository.repositories :
+        repository.homepage_url == null || repository.homepage_url == ""
+        if !contains(["ha-desloc", "ha-desloc-card"], name)
+      ])
+    )
+    error_message = "Preserve the two published DESLOC wiki routes without assigning homepages to other repositories."
   }
 }

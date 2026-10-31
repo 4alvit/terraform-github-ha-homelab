@@ -42,6 +42,16 @@ current native approval or the quota-aware `Review policy` check described below
 An empty `public_security_enforcement_repositories` value cannot remove these
 protections. Live visibility and archive checks still apply.
 
+DESLOC Card, Echo Dot, Echo Show 5, and SLZB recovery require one current independent
+approval, stale-review dismissal, approval of the last push, resolved review
+threads, and the strict `CI gate` from GitHub
+Actions (`15368`). Their mandatory membership cannot be removed by an empty
+`public_security_enforcement_repositories` value. Only the organization-owner
+bypass remains; repository-role bypasses are removed when this managed policy is
+applied. Check the scoped Terraform plan and the live ruleset after applying;
+merging this source does not activate the policy by itself. Verify the independent
+reviewer workflow on a current pull request before enforcing the native count.
+
 ## DESLOC review quota policy
 
 `desloc_quota_review_policy_enabled` selects the review mechanism for the public,

@@ -209,11 +209,12 @@ The workflow requires a current-head approval except for a verified CodeRabbit
 quota result; requested changes still block merging. This changes reviewer
 independence from last-pusher independence to pull-request-author independence.
 An empty `public_security_enforcement_repositories` value cannot remove the
-mandatory protections. The existing ruleset is updated in place, and the card's
-ruleset is unchanged. RF Airbridge retains its mandatory current-review policy;
-the other four audited public repositories retain their current review and bypass
-settings until explicitly activated through that variable. Existing required CI
-checks remain in place.
+mandatory protections. DESLOC retains its separate quota-aware review mechanism.
+DESLOC Card, Echo Dot, Echo Show 5, SLZB recovery, and RF Airbridge require one
+current independent approval and keep their existing required CI checks. The
+legacy activation variable remains accepted but cannot disable these public
+review policies. Verify each project's independent reviewer before applying;
+only the organization-owner bypass remains on these protected branches.
 See the [public security policy](docs/public-security.md) for activation and verification.
 No private-repository access policy changes are implied.
 
