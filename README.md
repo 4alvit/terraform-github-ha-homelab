@@ -115,11 +115,11 @@ defaults. Organization creation and avatar selection are outside this configurat
 ## Home Assistant source repositories
 
 `home-studio.tf` looks up the existing public `ha-homelab/home-studio`
-repository and manages only its default-branch CI ruleset. Pull requests must
-pass the exact `CI gate` check from GitHub Actions (integration `15368`), with
-strict up-to-date checks and the owner bypass. The gate aggregates Home Studio's
-required package, browser, installation and workflow checks. No additional review
-count or merge-method restriction is introduced. Repository settings, collaborators,
+repository and manages only its default-branch review/CI ruleset. Pull requests
+require one current independent approval and the exact `CI gate` check from
+GitHub Actions (integration `15368`), with strict up-to-date checks and the owner
+bypass. The gate aggregates Home Studio's required package, browser, installation
+and workflow checks. No merge-method restriction is introduced. Repository settings, collaborators,
 secrets and release environments are outside this resource's ownership.
 
 `home-studio-closed-build.tf` separately adopts the existing `closed-build`
@@ -136,11 +136,15 @@ plan/apply; CI also runs this anonymous, metadata-only check. Provider 6.13.0 ca
 retain a stale reviewer in state after the last live reviewer is removed, so a
 clean Terraform plan alone does not prove that approval is still required.
 
-Before applying, verify the live check name and app identity, then review a remote
-plan targeted to `github_repository_ruleset.home_studio_ci`. It should create only
-that ruleset. A failing Home Studio gate must block merging; changing the ruleset
-does not fix or waive browser failures. Validate the live default-branch rules after
-apply and retain the reviewed plan outside this public repository.
+Before applying the review change, obtain the Home Studio owner's release of the
+stable-artifact verification freeze and verify a real independent approval on a
+current pull-request head. Keep the existing check name and app identity. The
+reviewed plan must update the existing `github_repository_ruleset.home_studio_ci`
+in place, with no replacement or unrelated change. A failing Home Studio gate
+must block merging; changing the ruleset does not fix or waive browser failures.
+Validate the live default-branch rules after apply and retain the reviewed plan
+outside this public repository. Source configuration alone is not evidence that
+the policy has been applied.
 
 `home-assistant-private` retains the predecessor's private Git history at the
 existing `github_repository.repositories["home-assistant"]` Terraform address.
@@ -199,8 +203,13 @@ policy decision.
 
 GitHub Free does not support enforced private-repository rulesets; see
 [GitHub's availability documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets).
-The public `.github` profile retains its existing active protection and
-administrator bypass. Its Terraform resource address and remote ID are unchanged.
+The public `.github` profile requires one current independent review and retains
+the organization-owner bypass. Its generic repository-role bypass is removed;
+its Terraform resource address and remote ID are unchanged. No required CI check
+is invented for the profile. ZAC93 and the four community tools retain their exact
+`check` and `secrets` gates alongside one current review. See the
+[second-wave activation prerequisites](docs/public-security.md#remaining-public-review-coverage)
+before applying these source policies.
 The public `ha-desloc` integration requires pull requests, resolved review threads,
 protected history, and the strict GitHub Actions `CI gate`, with the owner bypass.
 The `desloc_quota_review_policy_enabled` transition replaces its native approval
