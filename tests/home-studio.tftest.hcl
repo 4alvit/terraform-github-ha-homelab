@@ -30,13 +30,15 @@ run "home_studio_requires_its_exact_ci_gate_with_owner_exception" {
       one(one(github_repository_ruleset.home_studio_ci.conditions).ref_name).include == tolist(["~DEFAULT_BRANCH"]) &&
       length(one(one(github_repository_ruleset.home_studio_ci.conditions).ref_name).exclude) == 0 &&
       length(one(github_repository_ruleset.home_studio_ci.rules).pull_request) == 1 &&
-      one(one(github_repository_ruleset.home_studio_ci.rules).pull_request).required_approving_review_count == 0 &&
+      one(one(github_repository_ruleset.home_studio_ci.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.home_studio_ci.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.home_studio_ci.rules).pull_request).require_last_push_approval &&
       one(one(github_repository_ruleset.home_studio_ci.rules).required_status_checks).strict_required_status_checks_policy &&
       length(one(one(github_repository_ruleset.home_studio_ci.rules).required_status_checks).required_check) == 1 &&
       one(one(one(github_repository_ruleset.home_studio_ci.rules).required_status_checks).required_check).context == "CI gate" &&
       one(one(one(github_repository_ruleset.home_studio_ci.rules).required_status_checks).required_check).integration_id == 15368
     )
-    error_message = "Home Studio must require its GitHub Actions CI gate and a pull request on the default branch, with only the documented owner exception or additional review requirements."
+    error_message = "Home Studio must require one current review and its exact GitHub Actions CI gate on the default branch, with only the documented owner exception."
   }
 }
 

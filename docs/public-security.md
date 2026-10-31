@@ -95,19 +95,16 @@ opted into with `automerge`. Merge and verify that workflow before applying the
 RF ruleset change; then read back the live approval count and both check names.
 This activates the previously deferred policy, without creating a parallel ruleset.
 
-The other four audited public repositories preserve their current administrator
-bypass and review settings by default. Set
-`public_security_enforcement_repositories` only for repositories whose approval
-automation has been verified; activation enables the same current-review policy
-with the documented owner bypass.
-This explicit activation does not affect the already active one-review policies
-for the button, Tuya conversion, and public Home Assistant repositories.
-Existing mandatory status checks and enabled auto-merge settings are preserved.
+The four audited public repositories listed above use mandatory current-review
+settings in source; the legacy activation input cannot disable them. Verify their
+approval automation before applying that configuration. This does not change the
+existing one-review policies for the button, Tuya conversion, and public Home
+Assistant repositories. Existing mandatory status checks and enabled auto-merge
+settings are preserved.
 
 Echo Dot requires the strict `CI gate` check from GitHub Actions (`15368`)
-independently of optional review activation. A neutral review-bot status is not
-source validation. Its existing review activation and administrator-bypass
-settings remain unchanged by this CI requirement. After applying the reviewed
+alongside independent review. A neutral review-bot status is not source
+validation. After applying the reviewed
 Terraform plan, read back the default-branch rules and verify the check name,
 application ID and strictness before closing the enforcement issue.
 
@@ -121,9 +118,48 @@ one-review policy, stale approval dismissal, latest-push approval, resolved
 threads remain required for ordinary merges; the owner bypass is separate.
 
 `zac93-esp32` retains its enabled auto-merge setting. Auto-merge still waits for
-the repository's strict `check` and `secrets` checks, and adds no ruleset bypass.
+one current independent review and the repository's strict `check` and `secrets`
+checks, and adds no ruleset bypass.
 Policy tests cover these established settings so a later apply cannot silently
 disable auto-merge or replace active checks with obsolete names.
+
+## Remaining public review coverage
+
+The follow-up to [issue #90](https://github.com/4alvit/terraform-github-ha-homelab/issues/90)
+adds one approving review, stale-approval dismissal and last-push approval to
+seven existing rulesets. It creates no new repositories, secret values or CI resources:
+
+- `zac93-esp32`: `github_repository_ruleset.zac93_publication`.
+- `.github`: `github_repository_ruleset.profile`.
+- `ha-entity-migrations`, `ha-meter-contracts`, `ha-scenario-tests` and
+  `assist-scenario-lab`: their existing `github_repository_ruleset.community_tools`
+  instances.
+- `home-studio`: `github_repository_ruleset.home_studio_ci`.
+
+The separate [credential-access proposal](review-bot-access.md) describes six
+individual memberships in the existing organization secret.
+
+ZAC93 and the four community tools keep the exact strict `check` and `secrets`
+requirements bound to GitHub Actions (`15368`). The tools also keep signed commits
+and resolved review threads. The profile has no required-status rule: its
+workflow validation is not a reason to require a nonexistent `CI gate` or add
+automatic merging. The profile's generic repository-role bypass is removed;
+the existing organization-owner bypass is retained in all seven rulesets.
+Home Studio keeps its exact strict `CI gate` and existing merge-method policy.
+The DESLOC quota exception, RF Airbridge, private repositories, release
+environments and the first-wave activation settings are unchanged.
+
+This is source policy, not a claim of live enforcement. Before applying, verify a
+real independent approval on each target's current pull-request head through a
+reviewed metadata-only route; a successful request job or write permission alone
+is insufficient. Keep first-wave and follow-up plans separate. Require a fresh
+plan with only the intended in-place ruleset updates and perform scoped live
+readback, including the extra Copilot approval field documented below.
+
+Home Studio is additionally held until its owner releases the stable-artifact
+verification freeze. Do not update its workflows or apply this ruleset during
+that freeze. If any target lacks its verified approval route, do not apply an
+unscoped plan containing its pending rule change.
 
 Secret scanning and push protection are enabled on the audited public repository
 resources managed by this state. Private vulnerability reporting was enabled
