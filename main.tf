@@ -110,6 +110,7 @@ locals {
       topics                 = ["amazon-echo", "echo-dot", "echomuse", "home-assistant", "openwakeword", "voice-assistant"]
     }
     ha-desloc = {
+      homepage_url     = "https://ha-homelab.github.io/ha-desloc/"
       description      = "Unofficial DESLOC C100 Plus cloud integration for Home Assistant: lock control, state, battery and Wi-Fi signal"
       visibility       = "public"
       has_issues       = true
@@ -117,6 +118,7 @@ locals {
       topics           = ["desloc", "hacs", "home-assistant", "home-assistant-custom-component", "smart-lock", "python"]
     }
     ha-desloc-card = {
+      homepage_url     = "https://ha-homelab.github.io/ha-desloc/#dashboard"
       description      = "Home Assistant Lovelace card for DESLOC locks: state, battery, Wi-Fi signal and confirmed unlock controls"
       visibility       = "public"
       has_issues       = true
@@ -263,10 +265,11 @@ resource "github_repository" "repositories" {
 
   for_each = local.repositories
 
-  name        = try(each.value.name, each.key)
-  description = each.value.description
-  visibility  = each.value.visibility
-  topics      = each.value.topics
+  name         = try(each.value.name, each.key)
+  description  = each.value.description
+  homepage_url = try(each.value.homepage_url, null)
+  visibility   = each.value.visibility
+  topics       = each.value.topics
 
   auto_init       = true
   has_issues      = try(each.value.has_issues, each.value.visibility == "private")
