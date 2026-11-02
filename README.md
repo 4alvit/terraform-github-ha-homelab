@@ -136,12 +136,11 @@ plan/apply; CI also runs this anonymous, metadata-only check. Provider 6.13.0 ca
 retain a stale reviewer in state after the last live reviewer is removed, so a
 clean Terraform plan alone does not prove that approval is still required.
 
-Home Studio has completed its stable-artifact verification freeze. Before
-applying the review change, verify a real independent approval on a current
-pull-request head and adopt its existing bot-secret association after checking
-state ownership. Keep the existing check name and app identity. The
-reviewed plan must update the existing `github_repository_ruleset.home_studio_ci`
-in place, with no replacement or unrelated change. A failing Home Studio gate
+Home Studio's review rollout completed on 2 November 2026 after its
+stable-artifact freeze and independent approval verification. Its existing
+bot-secret association is imported, and the existing
+`github_repository_ruleset.home_studio_ci` was updated in place through a
+reviewed HCP plan. The check name and app identity are preserved. A failing Home Studio gate
 must block merging; changing the ruleset does not fix or waive browser failures.
 Validate the live default-branch rules after apply and retain the reviewed plan
 outside this public repository. Source configuration alone is not evidence that
@@ -209,8 +208,7 @@ the organization-owner bypass. Its generic repository-role bypass is removed;
 its Terraform resource address and remote ID are unchanged. No required CI check
 is invented for the profile. ZAC93 and the four community tools retain their exact
 `check` and `secrets` gates alongside one current review. See the
-[second-wave activation prerequisites](docs/public-security.md#remaining-public-review-coverage)
-before applying these source policies.
+[completed rollout and future activation checks](docs/public-security.md#remaining-public-review-coverage).
 The public `ha-desloc` integration requires pull requests, resolved review threads,
 protected history, and the strict GitHub Actions `CI gate`, with the owner bypass.
 The `desloc_quota_review_policy_enabled` transition replaces its native approval

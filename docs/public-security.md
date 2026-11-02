@@ -136,7 +136,7 @@ seven existing rulesets. It creates no new repositories, secret values or CI res
   instances.
 - `home-studio`: `github_repository_ruleset.home_studio_ci`.
 
-The separate [credential-access proposal](review-bot-access.md) describes six
+The separate [credential-access record](review-bot-access.md) describes six
 individual memberships in the existing organization secret: five additions
 and adoption of the existing Home Studio association.
 
@@ -150,17 +150,25 @@ Home Studio keeps its exact strict `CI gate` and existing merge-method policy.
 The DESLOC quota exception, RF Airbridge, private repositories, release
 environments and the first-wave activation settings are unchanged.
 
-This is source policy, not a claim of live enforcement. Before applying, verify a
+The rollout completed on **2 November 2026**. The canonical HCP workspace
+`victron-venus/github-ha-homelab-infrastructure` applied five secret memberships
+and imported the existing Home Studio membership, then separately updated all
+seven existing rulesets. Each new caller produced a real current-head bot
+approval and passed validation before merging. GitHub readback confirmed the
+one-review policy, unchanged CI identities and strictness, and
+`require_extra_approval_for_unattributed_changes=false` after scoped reconciliation.
+
+For later changes, verify a
 real independent approval on each target's current pull-request head through a
 reviewed metadata-only route; a successful request job or write permission alone
 is insufficient. Keep first-wave and follow-up plans separate. Require a fresh
 plan with only the intended in-place ruleset updates and perform scoped live
 readback, including the extra Copilot approval field documented below.
 
-Home Studio has completed its stable-artifact verification freeze; its existing
-secret association still requires an ownership check and adoption. If any target
-lacks its verified approval route, do not apply an unscoped plan containing its
-pending rule change.
+Home Studio's stable-artifact freeze was completed before this rollout; its
+existing secret association is now state-managed. If a future target lacks its
+verified approval route, do not apply an unscoped plan containing its pending
+rule change. A saved source configuration alone does not prove later live state.
 
 Secret scanning and push protection are enabled on the audited public repository
 resources managed by this state. Private vulnerability reporting was enabled
