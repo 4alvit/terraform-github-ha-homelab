@@ -54,6 +54,66 @@ resource "github_workflow_repository_permissions" "asterisk_telephony" {
   can_approve_pull_request_reviews = false
 }
 
+resource "github_repository_ruleset" "asterisk_telephony" {
+  name        = "Asterisk required CI and review"
+  repository  = github_repository.asterisk_telephony.name
+  target      = "branch"
+  enforcement = "active"
+
+  bypass_actors {
+    actor_id    = local.owner_emergency_merge_actor.actor_id
+    actor_type  = local.owner_emergency_merge_actor.actor_type
+    bypass_mode = local.owner_emergency_merge_actor.bypass_mode
+  }
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion         = true
+    non_fast_forward = true
+    pull_request {
+      allowed_merge_methods             = ["squash"]
+      required_approving_review_count   = 1
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
+      required_review_thread_resolution = true
+    }
+    required_status_checks {
+      strict_required_status_checks_policy = true
+      required_check {
+        context        = "test"
+        integration_id = 15368
+      }
+      required_check {
+        context        = "home-assistant-runtime (requirements-runtime.txt)"
+        integration_id = 15368
+      }
+      required_check {
+        context        = "home-assistant-runtime (requirements-runtime-2026.10.0.txt)"
+        integration_id = 15368
+      }
+      required_check {
+        context        = "CodeQL"
+        integration_id = 57789
+      }
+    }
+  }
+
+  depends_on = [github_repository_collaborator.public_release_reviewers["asterisk-telephony"]]
+
+  lifecycle {
+    precondition {
+      condition     = data.github_repository.public_release_review_targets["asterisk-telephony"].visibility == "public" && !data.github_repository.public_release_review_targets["asterisk-telephony"].archived
+      error_message = "The Asterisk review policy applies only to its active public repository."
+    }
+  }
+}
+
 output "asterisk_telephony_repository" {
   description = "Public reusable Asterisk/Home Assistant companion repository."
   value = {
