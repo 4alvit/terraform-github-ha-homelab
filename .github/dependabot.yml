@@ -13,3 +13,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
+
+# security/provider is a dependency snapshot, not a standalone module.
+# Regenerate and qualify it with scripts/build_secure_provider.py; standalone
+# Go-module updates can delete upstream requirements and checksums.
