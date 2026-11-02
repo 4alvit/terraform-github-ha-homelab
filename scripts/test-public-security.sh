@@ -10,6 +10,7 @@ cp main.tf public-security.tf home-assistant-public.tf home-studio.tf home-studi
 mv "$temporary/public-security-main.tf.fixture" "$temporary/test-providers.tf"
 cp tests/public-security.tftest.hcl "$temporary/tests/"
 cp asterisk-telephony.tf "$temporary/"
+cp tests/asterisk-telephony.tftest.hcl "$temporary/tests/"
 cp tests/branch-cleanup.tftest.hcl "$temporary/tests/"
 cp tests/public-adapters.tftest.hcl "$temporary/tests/"
 cp tests/home-studio.tftest.hcl "$temporary/tests/"

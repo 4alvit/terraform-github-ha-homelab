@@ -31,6 +31,31 @@ it. Bootstrap deliberately does not add a main-branch ruleset requiring checks
 that do not yet exist. Any later ruleset must use the companion's actual successful
 check name and a separately reviewed Terraform change. No bot grant is implied.
 
+## Review and source-analysis policy after bootstrap
+
+The separate `github_repository_ruleset.asterisk_telephony` resource protects the
+existing default branch. It requires one current approval, resolution of review
+threads, and up-to-date successful checks: `test`, both
+`home-assistant-runtime` requirements profiles, and the `CodeQL` result. The first
+three checks are bound to GitHub Actions (`15368`); the CodeQL result is bound to
+its own app (`57789`). These names and app identities were verified on the source
+analysis pull request. Do not substitute a nonexistent `CI gate` check.
+
+The existing `public_release_reviewers["asterisk-telephony"]` resource grants
+`californiantiramisu` repository-scoped Write access so its review can satisfy the
+rule. Organization owners retain the established maintenance bypass; the bot
+receives neither administration nor bypass. The workflow-token permissions and
+organization-secret allowlists remain unchanged.
+
+Apply this stage only after reviewing a plan restricted to the new ruleset and
+this one collaborator grant. Existing repository, billing, secret, and other
+ruleset changes are outside its scope. If either object already exists, import
+its exact identity instead of creating a duplicate. After apply, verify effective
+Write access, the active default-branch rules, and all four required check names
+and app IDs. Reconcile the unsupported extra approval flag using the
+[existing review-policy procedure](public-security.md#extra-copilot-approval-after-terraform).
+A committed policy is not evidence of a completed apply.
+
 Recovery preserves repository identity and HCP state: `prevent_destroy` rejects
 accidental removal, and `archive_on_destroy` is a second safeguard rather than an
 automatic rollback action. Correct settings at the same Terraform addresses. Do

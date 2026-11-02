@@ -17,8 +17,11 @@ automations, scripts, household data, and credentials belong in private reposito
 - `ha-homelab/asterisk-telephony` — reusable Home Assistant/Asterisk companion
   with AMI event bridging, phone entities, call actions and deployment guidance.
   Household topology, SIP/AMI credentials and Cisco firmware remain outside the
-  public repository. Its bootstrap grants no bot access or runner infrastructure;
-  see [the scoped provisioning procedure](docs/asterisk-telephony-provisioning.md).
+  public repository. After bootstrap, the default branch requires one current
+  review, both Home Assistant runtime profiles, contract tests, and CodeQL.
+  The existing review bot receives repository-scoped Write access without a rule
+  bypass; no runner infrastructure is added. See the
+  [scoped provisioning procedure](docs/asterisk-telephony-provisioning.md).
 
 - `ha-homelab/ha-radio-hub` — modular single-input PoE radio appliance,
   ESPHome firmware, local OTBR deployment, original wiring and printable CAD.

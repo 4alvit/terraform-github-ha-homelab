@@ -4,6 +4,7 @@ locals {
   public_release_review_repositories = toset([
     ".github",
     "assist-scenario-lab",
+    "asterisk-telephony",
     "ha-echo-dot",
     "ha-echo-show-5",
     "ha-entity-migrations",
