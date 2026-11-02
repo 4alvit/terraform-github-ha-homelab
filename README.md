@@ -136,9 +136,10 @@ plan/apply; CI also runs this anonymous, metadata-only check. Provider 6.13.0 ca
 retain a stale reviewer in state after the last live reviewer is removed, so a
 clean Terraform plan alone does not prove that approval is still required.
 
-Before applying the review change, obtain the Home Studio owner's release of the
-stable-artifact verification freeze and verify a real independent approval on a
-current pull-request head. Keep the existing check name and app identity. The
+Home Studio has completed its stable-artifact verification freeze. Before
+applying the review change, verify a real independent approval on a current
+pull-request head and adopt its existing bot-secret association after checking
+state ownership. Keep the existing check name and app identity. The
 reviewed plan must update the existing `github_repository_ruleset.home_studio_ci`
 in place, with no replacement or unrelated change. A failing Home Studio gate
 must block merging; changing the ruleset does not fix or waive browser failures.

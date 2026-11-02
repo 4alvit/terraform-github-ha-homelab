@@ -1,4 +1,5 @@
-# Add six missing memberships to the existing selected-repository secret.
+# Manage six explicit memberships in the existing selected-repository secret.
+# Home Studio already has access and must be adopted rather than recreated.
 # Do not own its value, visibility, or the memberships of other repositories.
 locals {
   public_review_bot_access_repositories = toset([

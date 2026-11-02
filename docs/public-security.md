@@ -137,7 +137,8 @@ seven existing rulesets. It creates no new repositories, secret values or CI res
 - `home-studio`: `github_repository_ruleset.home_studio_ci`.
 
 The separate [credential-access proposal](review-bot-access.md) describes six
-individual memberships in the existing organization secret.
+individual memberships in the existing organization secret: five additions
+and adoption of the existing Home Studio association.
 
 ZAC93 and the four community tools keep the exact strict `check` and `secrets`
 requirements bound to GitHub Actions (`15368`). The tools also keep signed commits
@@ -156,10 +157,10 @@ is insufficient. Keep first-wave and follow-up plans separate. Require a fresh
 plan with only the intended in-place ruleset updates and perform scoped live
 readback, including the extra Copilot approval field documented below.
 
-Home Studio is additionally held until its owner releases the stable-artifact
-verification freeze. Do not update its workflows or apply this ruleset during
-that freeze. If any target lacks its verified approval route, do not apply an
-unscoped plan containing its pending rule change.
+Home Studio has completed its stable-artifact verification freeze; its existing
+secret association still requires an ownership check and adoption. If any target
+lacks its verified approval route, do not apply an unscoped plan containing its
+pending rule change.
 
 Secret scanning and push protection are enabled on the audited public repository
 resources managed by this state. Private vulnerability reporting was enabled

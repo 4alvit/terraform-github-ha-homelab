@@ -1,8 +1,11 @@
 # Review bot access for the remaining public projects
 
 The review-policy follow-up in issue #90 uses the existing `BOT_PAT`
-organization secret. `public-review-bot-access.tf` proposes six individual
+organization secret. `public-review-bot-access.tf` manages six individual
 repository memberships: ZAC93, the four community tools and Home Studio.
+The current access inventory requires five additions; Home Studio already has
+access. Check state ownership and adopt that existing association with import ID
+`BOT_PAT:1414876449` instead of removing or recreating it.
 The organization profile already has access and is deliberately excluded.
 This resource owns neither the credential value nor its visibility, and does
 not replace the existing selected-repository list. It creates no new token,
@@ -24,11 +27,11 @@ enforcing the native review count. A bot-authored pull request still needs a
 different reviewer; the existing human review path does not require creating
 another credential.
 
-Home Studio remains on hold until its owner releases the stable-artifact
-verification freeze. Do not apply its secret membership, review rule or workflow
-changes before that release. Keep the separate first-wave configuration and
-apply plan immutable; an unscoped plan containing pending second-wave changes
-must not be used for first-wave activation.
+Home Studio has completed its stable-artifact verification freeze. Its existing
+access must still be adopted before policy activation, and the current-head
+approval requirement applies to it as to every other target. Keep the separate
+first-wave configuration and apply plan immutable; an unscoped plan containing
+pending second-wave changes must not be used for first-wave activation.
 
 Before and after an approved membership apply, compare the full selected-ID
 list: only the reviewed additions may differ. Re-read secret visibility and

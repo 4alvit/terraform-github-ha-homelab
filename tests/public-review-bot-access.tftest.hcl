@@ -54,7 +54,7 @@ run "review_bot_access_is_six_singleton_memberships_only" {
       !contains(keys(github_actions_organization_secret_repository.public_review_bot_access), ".github") &&
       !contains(keys(github_actions_organization_secret_repository.public_review_bot_access), "ha-echo-dot")
     )
-    error_message = "Only the six missing repositories may join the existing BOT_PAT allowlist; existing profile and first-wave memberships must remain outside this resource."
+    error_message = "Only the six declared repositories may be managed in the existing BOT_PAT allowlist; existing profile and first-wave memberships must remain outside this resource."
   }
 }
 
