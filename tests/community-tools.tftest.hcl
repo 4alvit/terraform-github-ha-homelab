@@ -29,9 +29,15 @@ run "public_tools_keep_signed_reviewed_source_and_secret_gates" {
         ) &&
         one(github_repository_ruleset.community_tools[name].rules).required_signatures &&
         length(one(github_repository_ruleset.community_tools[name].rules).pull_request) == 1 &&
-        toset([for check in one(one(github_repository_ruleset.community_tools[name].rules).required_status_checks).required_check : check.context]) == toset(["check", "secrets"])
+        one(one(github_repository_ruleset.community_tools[name].rules).pull_request).required_approving_review_count == 1 &&
+        one(one(github_repository_ruleset.community_tools[name].rules).pull_request).dismiss_stale_reviews_on_push &&
+        one(one(github_repository_ruleset.community_tools[name].rules).pull_request).require_last_push_approval &&
+        one(one(github_repository_ruleset.community_tools[name].rules).pull_request).required_review_thread_resolution &&
+        one(one(github_repository_ruleset.community_tools[name].rules).required_status_checks).strict_required_status_checks_policy &&
+        toset([for check in one(one(github_repository_ruleset.community_tools[name].rules).required_status_checks).required_check : check.context]) == toset(["check", "secrets"]) &&
+        alltrue([for check in one(one(github_repository_ruleset.community_tools[name].rules).required_status_checks).required_check : check.integration_id == 15368])
       )
     ])
-    error_message = "Every public tool must retain source and full-history secret gates, signed commits, pull requests, and no additional bypass actors."
+    error_message = "Every public tool must require one current review and retain its exact app-bound source/secret gates, signed commits, resolved threads, and only the owner bypass."
   }
 }

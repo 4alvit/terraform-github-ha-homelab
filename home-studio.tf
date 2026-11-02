@@ -1,4 +1,4 @@
-# Home Studio already exists. Own only its required CI ruleset here; importing
+# Home Studio already exists. Own only its review/CI ruleset here; importing
 # repository settings, collaborators and release configuration is separate work.
 data "github_repository" "home_studio" {
   full_name = "ha-homelab/home-studio"
@@ -33,7 +33,9 @@ resource "github_repository_ruleset" "home_studio_ci" {
 
   rules {
     pull_request {
-      required_approving_review_count = 0
+      dismiss_stale_reviews_on_push   = true
+      require_last_push_approval      = true
+      required_approving_review_count = 1
     }
     required_status_checks {
       strict_required_status_checks_policy = true

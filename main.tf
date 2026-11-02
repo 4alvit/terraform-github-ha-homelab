@@ -162,8 +162,8 @@ locals {
   }
 }
 
-# Block publication to the new guide's default branch unless both source and
-# secret checks pass. The separate owner bypass also permits direct updates.
+# Require current independent review and both publication checks for the guide.
+# The separate organization-owner bypass also permits maintenance updates.
 resource "github_repository_ruleset" "zac93_publication" {
   name        = "Protect main"
   repository  = github_repository.repositories["zac93-esp32"].name
@@ -189,7 +189,9 @@ resource "github_repository_ruleset" "zac93_publication" {
     non_fast_forward = true
     pull_request {
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 0
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
+      required_approving_review_count   = 1
       required_review_thread_resolution = true
     }
     required_status_checks {
@@ -360,19 +362,13 @@ resource "github_repository_dependabot_security_updates" "repositories" {
   depends_on = [github_repository_vulnerability_alerts.repositories]
 }
 
-# Protect the public profile only. Private repositories intentionally rely on
-# the owners' PR/CI workflow; a plan upgrade must not enable rules automatically.
+# Require independent review for the public profile without inventing a CI gate.
+# Private repositories retain their separately documented policy.
 resource "github_repository_ruleset" "profile" {
   name        = "Protect main"
   repository  = github_repository.repositories[".github"].name
   target      = "branch"
   enforcement = "active"
-
-  bypass_actors {
-    actor_id    = 5
-    actor_type  = "RepositoryRole"
-    bypass_mode = "always"
-  }
 
   # Organization owners may bypass this branch rule for maintenance.
   bypass_actors {
@@ -393,7 +389,9 @@ resource "github_repository_ruleset" "profile" {
     non_fast_forward = true
     pull_request {
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 0
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
+      required_approving_review_count   = 1
       required_review_thread_resolution = true
     }
   }

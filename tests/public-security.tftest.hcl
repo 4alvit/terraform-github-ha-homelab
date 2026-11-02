@@ -153,10 +153,15 @@ run "zac93_requires_source_and_secret_checks_with_owner_exception" {
       ) &&
       one(github_repository_ruleset.zac93_publication.rules).deletion &&
       one(github_repository_ruleset.zac93_publication.rules).non_fast_forward &&
+      one(one(github_repository_ruleset.zac93_publication.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.zac93_publication.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.zac93_publication.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.zac93_publication.rules).pull_request).required_review_thread_resolution &&
       one(one(github_repository_ruleset.zac93_publication.rules).required_status_checks).strict_required_status_checks_policy &&
-      toset([for check in one(one(github_repository_ruleset.zac93_publication.rules).required_status_checks).required_check : check.context]) == toset(["check", "secrets"])
+      toset([for check in one(one(github_repository_ruleset.zac93_publication.rules).required_status_checks).required_check : check.context]) == toset(["check", "secrets"]) &&
+      alltrue([for check in one(one(github_repository_ruleset.zac93_publication.rules).required_status_checks).required_check : check.integration_id == 15368])
     )
-    error_message = "The ZAC93 guide must retain auto-merge while protecting secrets and requiring both publication checks without a bypass."
+    error_message = "The ZAC93 guide must require one current review and retain auto-merge, both app-bound publication checks, resolved threads, and only the owner bypass."
   }
 }
 
@@ -604,7 +609,7 @@ run "capture_bot_secret_access_is_one_existing_secret_membership" {
   }
 }
 
-run "profile_and_private_repository_settings_are_unchanged" {
+run "profile_requires_review_without_a_synthetic_ci_gate_or_private_changes" {
   command = plan
   assert {
     condition = (
@@ -615,13 +620,19 @@ run "profile_and_private_repository_settings_are_unchanged" {
           coalesce(actor.actor_id, 0) == coalesce(local.owner_emergency_merge_actor.actor_id, 0) && actor.bypass_mode == "always"
           if actor.actor_type == local.owner_emergency_merge_actor.actor_type
         ]) &&
-        length([for actor in github_repository_ruleset.profile.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 1
+        length([for actor in github_repository_ruleset.profile.bypass_actors : actor if actor.actor_type != local.owner_emergency_merge_actor.actor_type]) == 0
       ) &&
-      one(one(github_repository_ruleset.profile.rules).pull_request).required_approving_review_count == 0 &&
+      one(one(github_repository_ruleset.profile.rules).pull_request).required_approving_review_count == 1 &&
+      one(one(github_repository_ruleset.profile.rules).pull_request).dismiss_stale_reviews_on_push &&
+      one(one(github_repository_ruleset.profile.rules).pull_request).require_last_push_approval &&
+      one(one(github_repository_ruleset.profile.rules).pull_request).required_review_thread_resolution &&
+      length(one(github_repository_ruleset.profile.rules).required_status_checks) == 0 &&
+      one(github_repository_ruleset.profile.rules).deletion &&
+      one(github_repository_ruleset.profile.rules).non_fast_forward &&
       length(github_repository.repositories[".github"].security_and_analysis) == 0 &&
       length(github_repository.repositories["automations"].security_and_analysis) == 0
     )
-    error_message = "The profile and private repository must remain outside the public software rollout."
+    error_message = "The public profile must require one current review with only the owner bypass, without inventing a CI gate or changing private-repository security settings."
   }
 }
 

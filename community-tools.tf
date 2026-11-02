@@ -36,7 +36,9 @@ resource "github_repository_ruleset" "community_tools" {
     required_signatures = true
     pull_request {
       allowed_merge_methods             = ["squash"]
-      required_approving_review_count   = 0
+      dismiss_stale_reviews_on_push     = true
+      require_last_push_approval        = true
+      required_approving_review_count   = 1
       required_review_thread_resolution = true
     }
     required_status_checks {
