@@ -81,7 +81,7 @@ public versions while retaining deployment, geometry and device bindings private
 - `ha-homelab/ha-echomuse` — public EchoMuse deployment and Home Assistant
   integration for repurposed Echo Dot 2 devices. Device backups, credentials,
   recordings, and household identifiers are excluded. Bootstrap its repository,
-  default branch, vulnerability alerts, and Dependabot security updates first;
+  default branch, vulnerability alerts, and the disabled Dependabot update setting first;
   publish reviewed source and verify the `CI gate` before applying its ruleset.
 - `ha-homelab/ha-techo5-dot` — public TECHO5 deployment and Home Assistant
   integration guides for repurposed Echo Dot devices, with a separate wiki and
@@ -189,7 +189,8 @@ provider validation without credentials; merging a PR does not itself apply chan
 
 Visibility is explicit, repository destruction is blocked, and default
 branches are `main`. Squash merges keep history readable and remove merged branches.
-Dependabot security updates and vulnerability alerts are enabled where supported.
+Vulnerability alerts remain enabled where supported. Renovate owns dependency updates;
+Terraform explicitly keeps Dependabot security-update PRs disabled.
 
 ### Default branch protection
 
@@ -245,7 +246,7 @@ their corresponding addresses as well. Never commit state or credentials.
 ## LG TV capture bootstrap
 
 Provision `ha-lg-tv-capture` with its generated README, secret scanning, push
-protection, Dependabot and read-only workflow-token defaults. Publish the reviewed
+protection, vulnerability alerts, disabled Dependabot updates and read-only workflow-token defaults. Publish the reviewed
 source and MIT license through a pull request, then activate
 `github_repository_ruleset.lg_tv_capture` when the source workflow provides
 `CI gate`. The ruleset requires one current approval with the owner bypass and allows
@@ -387,7 +388,7 @@ The [disclosed secure-provider profile](docs/SECURE_PROVIDER.md) builds a review
 
 `ruview-home-sensing.tf` creates [ha-homelab/ruview-home-sensing](https://github.com/ha-homelab/ruview-home-sensing) as an independent public repository. Publication uses reviewed generic source and a new Git history; no existing repository changes visibility. Installation configuration, device identities, credentials, observations and floor plans are excluded from this repository.
 
-The initial repository has secret scanning and push protection, vulnerability alerts, Dependabot security updates, read-only default workflow permissions, and approval support for explicitly authorized metadata workflows. `CI_RUNNER_MODE=github` overrides organization routing so shared workflows use GitHub-hosted runners. The project also checks that policy before launching its shared validation. Main requires one current independent approval, resolved review threads, the `Public CI gate` check from GitHub Actions, and the separate `CodeQL` result from GitHub Advanced Security, with the owner bypass. A successful SARIF upload does not bypass security findings. Automatic merging is enabled, but both validation checks and current independent approval remain mandatory. Version tags matching `v*` cannot be updated or deleted; new release tags remain permitted.
+The initial repository has secret scanning and push protection, vulnerability alerts, an explicitly disabled Dependabot security-update setting, read-only default workflow permissions, and approval support for explicitly authorized metadata workflows. `CI_RUNNER_MODE=github` overrides organization routing so shared workflows use GitHub-hosted runners. The project also checks that policy before launching its shared validation. Main requires one current independent approval, resolved review threads, the `Public CI gate` check from GitHub Actions, and the separate `CodeQL` result from GitHub Advanced Security, with the owner bypass. A successful SARIF upload does not bypass security findings. Automatic merging is enabled, but both validation checks and current independent approval remain mandatory. Version tags matching `v*` cannot be updated or deleted; new release tags remain permitted.
 
 Provisioning is a reviewed targeted HCP plan containing only the twelve RuView resources (the runner variable is `ruview_home_sensing_hosted` and the version-tag ruleset is `ruview_home_sensing_tags`). Check for unexpected addresses or non-create actions before the first apply. Existing organization repositories are outside this bootstrap scope. Repository files and application releases remain owned by their source PRs.
 
