@@ -42,7 +42,7 @@ run "public_cloudflare_module_has_scoped_review_and_no_deployment_data" {
       github_actions_organization_secret_repository.cloudflare_home_assistant_bot.repository_id == 424243 &&
       github_actions_variable.cloudflare_home_assistant_hosted.value == "github" &&
       github_actions_variable.cloudflare_home_assistant_hosted.variable_name == "CI_RUNNER_MODE" &&
-      github_repository_dependabot_security_updates.cloudflare_home_assistant.enabled &&
+      !github_repository_dependabot_security_updates.cloudflare_home_assistant.enabled &&
       github_repository_ruleset.cloudflare_home_assistant.enforcement == "active" &&
       (
         length([for actor in github_repository_ruleset.cloudflare_home_assistant.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&

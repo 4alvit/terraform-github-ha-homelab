@@ -86,7 +86,7 @@ resource "github_repository_vulnerability_alerts" "ruview_home_sensing" {
 
 resource "github_repository_dependabot_security_updates" "ruview_home_sensing" {
   repository = github_repository.ruview_home_sensing.id
-  enabled    = true
+  enabled    = false
   depends_on = [github_repository_vulnerability_alerts.ruview_home_sensing]
 }
 

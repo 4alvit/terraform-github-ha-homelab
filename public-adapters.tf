@@ -74,7 +74,7 @@ resource "github_repository_vulnerability_alerts" "public_adapters" {
 resource "github_repository_dependabot_security_updates" "public_adapters" {
   for_each   = github_repository.public_adapters
   repository = each.value.id
-  enabled    = true
+  enabled    = false
   depends_on = [github_repository_vulnerability_alerts.public_adapters]
 }
 

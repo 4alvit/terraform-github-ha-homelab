@@ -358,7 +358,7 @@ resource "github_repository_vulnerability_alerts" "repositories" {
 resource "github_repository_dependabot_security_updates" "repositories" {
   for_each   = github_repository.repositories
   repository = each.value.id
-  enabled    = true
+  enabled    = false
   depends_on = [github_repository_vulnerability_alerts.repositories]
 }
 

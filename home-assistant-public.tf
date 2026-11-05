@@ -51,7 +51,7 @@ resource "github_repository_vulnerability_alerts" "home_assistant_public" {
 
 resource "github_repository_dependabot_security_updates" "home_assistant_public" {
   repository = github_repository.home_assistant_public.id
-  enabled    = true
+  enabled    = false
   depends_on = [github_repository_vulnerability_alerts.home_assistant_public]
 }
 
