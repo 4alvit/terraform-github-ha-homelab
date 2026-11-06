@@ -24,11 +24,16 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Classify complete change
+        id: scope
+        run: python3 scripts/change_scope.py --documentation-paths-json '["GOVERNANCE.md", "ROADMAP.md"]'
       - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         with:
           terraform_version: 1.16.6
           terraform_wrapper: false
       - name: Install verified TFLint
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         uses: terraform-linters/setup-tflint@6ffdbaa3be476b3431f7275c26966ef32ff60337 # v6.3.2
         with:
           tflint_version: v0.64.0
@@ -36,35 +41,42 @@ jobs:
             cca9d13e2e1d7a2c627af60ff899a3c9b74212899416aeb96ec764d2ef954537
             560da89aacf59389d4eb029730dd5b109b7288096c32f2726a0d9e783a5ea8eb
       - name: Check formatting
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         run: terraform fmt -check -recursive
       - name: Initialize providers without connecting to HCP Terraform
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         run: terraform init -backend=false -input=false -lockfile=readonly
       - name: Validate configuration
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         run: terraform validate -no-color
       - name: Test public security policy without live API access
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         run: bash scripts/test-public-security.sh
       - name: Test independent environment policy verification
         run: python3 -m unittest discover -s tests -p 'test_closed_environment.py'
       - name: Verify the live closed-build review and branch policy
         run: python3 scripts/check-closed-environment.py
       - name: Analyze all Terraform source
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         run: tflint --config="$PWD/.tflint.hcl" --recursive
       - name: Verify isolated secure-provider builder
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         run: |
           python3 -m venv "$RUNNER_TEMP/secure-provider-tests"
           "$RUNNER_TEMP/secure-provider-tests/bin/pip" install --require-hashes -r requirements-security-tests.txt
           "$RUNNER_TEMP/secure-provider-tests/bin/python" -m unittest discover -s tests -p 'test_secure*.py'
       - name: Verify provider snapshot and classify source changes
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         id: provider
         run: python3 scripts/check_provider_snapshot.py --github-output
       - name: Set up the exact derivative compiler
-        if: steps.provider.outputs.qualify == 'true'
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only') && (steps.provider.outputs.qualify == 'true')
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: '1.27.3'
           cache: false
       - name: Qualify provider against real upstream source
-        if: steps.provider.outputs.qualify == 'true'
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only') && (steps.provider.outputs.qualify == 'true')
         run: |
           if ! python3 scripts/build_secure_provider.py --go "$(command -v go)" \
             --output "$RUNNER_TEMP/secure-provider-qualified" --platform linux_amd64; then
@@ -75,6 +87,7 @@ jobs:
           fi
           cat "$RUNNER_TEMP/secure-provider-qualified/provenance.json"
       - name: Verify real Terraform and provider TLS boundaries
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         env:
           TLS_TEST_PLATFORM: linux_amd64
         run: |
@@ -104,6 +117,7 @@ jobs:
           go version -m "$provider_dir/terraform-provider-github_v6.13.0"
           "$RUNNER_TEMP/tls-test-venv/bin/python" scripts/test_tls_profile.py
       - name: Validate the FLOSS OpenTofu compatibility profile
+        if: (steps.scope.outputs.run != 'false' || steps.scope.outputs.reason != 'documentation-only')
         run: |
           tofu_dir="$RUNNER_TEMP/opentofu-1.13.1"
           mkdir -p "$tofu_dir"
@@ -112,3 +126,6 @@ jobs:
           unzip "$tofu_dir/tofu.zip" -d "$tofu_dir"
           TOFU_BIN="$tofu_dir/tofu" python3 scripts/check_opentofu.py
           TLS_TEST_TERRAFORM="$tofu_dir/tofu" TLS_TEST_PROVIDER_DIR="$RUNNER_TEMP/tls-provider" TLS_TEST_PLATFORM=linux_amd64 "$RUNNER_TEMP/tls-test-venv/bin/python" scripts/test_tls_profile.py
+      - name: Report documentation-only result
+        if: steps.scope.outputs.run == 'false' && steps.scope.outputs.reason == 'documentation-only'
+        run: echo 'Documentation-only change; provider builds and Terraform suites were not exercised. Independent environment policy checks still ran.'

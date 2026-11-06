@@ -427,3 +427,13 @@ update coverage as well as CI updates, including each project's documented
 manual procedures for source-bound locks, exports or compatibility holds.
 Keep vulnerability alerts enabled where configured. A CI-only Renovate preset
 is not sufficient evidence for disabling the previous application updater.
+
+### Documentation-only CI
+
+Pull requests and pushes classify their complete Git diff before installing
+Terraform tools or building the secure provider. Ordinary documentation changes
+keep the required `Terraform validation` context and independent closed-build
+environment policy tests/check active, while skipping source/provider suites.
+CodeQL continues independently. Code, provider definitions, workflow changes,
+file-mode changes and uncertain history retain full validation; manual dispatch
+always uses the full path. CI still does not apply infrastructure changes.
