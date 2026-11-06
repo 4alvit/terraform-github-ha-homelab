@@ -86,7 +86,7 @@ resource "github_repository_vulnerability_alerts" "cloudflare_home_assistant" {
 
 resource "github_repository_dependabot_security_updates" "cloudflare_home_assistant" {
   repository = github_repository.cloudflare_home_assistant.id
-  enabled    = true
+  enabled    = false
   depends_on = [github_repository_vulnerability_alerts.cloudflare_home_assistant]
 }
 

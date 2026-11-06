@@ -86,7 +86,7 @@ resource "github_repository_vulnerability_alerts" "techo5_dot" {
 
 resource "github_repository_dependabot_security_updates" "techo5_dot" {
   repository = github_repository.techo5_dot.id
-  enabled    = true
+  enabled    = false
   depends_on = [github_repository_vulnerability_alerts.techo5_dot]
 }
 

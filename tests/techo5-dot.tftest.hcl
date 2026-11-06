@@ -42,7 +42,7 @@ run "public_techo5_dot_has_scoped_review_and_no_device_data" {
       github_actions_organization_secret_repository.techo5_dot_bot.repository_id == 424243 &&
       github_actions_variable.techo5_dot_hosted.value == "github" &&
       github_actions_variable.techo5_dot_hosted.variable_name == "CI_RUNNER_MODE" &&
-      github_repository_dependabot_security_updates.techo5_dot.enabled &&
+      !github_repository_dependabot_security_updates.techo5_dot.enabled &&
       github_repository_ruleset.techo5_dot.enforcement == "active" &&
       (
         length([for actor in github_repository_ruleset.techo5_dot.bypass_actors : actor if actor.actor_type == local.owner_emergency_merge_actor.actor_type]) == 1 &&

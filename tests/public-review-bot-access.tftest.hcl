@@ -8,7 +8,7 @@ mock_provider "github" {
   }
 }
 
-run "review_bot_access_is_six_singleton_memberships_only" {
+run "review_bot_access_is_seven_singleton_memberships_only" {
   command = plan
   override_data {
     target = data.github_repository.public_release_review_targets["assist-scenario-lab"]
@@ -34,11 +34,16 @@ run "review_bot_access_is_six_singleton_memberships_only" {
     target = data.github_repository.public_release_review_targets["zac93-esp32"]
     values = { repo_id = 106, visibility = "public", archived = false }
   }
+  override_data {
+    target = data.github_repository.public_release_review_targets["ha-jbd-bms-card"]
+    values = { repo_id = 107, visibility = "public", archived = false }
+  }
   assert {
     condition = (
       toset(keys(github_actions_organization_secret_repository.public_review_bot_access)) == toset([
         "assist-scenario-lab",
         "ha-entity-migrations",
+        "ha-jbd-bms-card",
         "ha-meter-contracts",
         "ha-scenario-tests",
         "home-studio",
@@ -50,11 +55,11 @@ run "review_bot_access_is_six_singleton_memberships_only" {
         membership.repository_id == data.github_repository.public_release_review_targets[name].repo_id &&
         data.github_repository.public_release_review_targets[name].full_name == "ha-homelab/${name}"
       ]) &&
-      toset([for membership in github_actions_organization_secret_repository.public_review_bot_access : membership.repository_id]) == toset([101, 102, 103, 104, 105, 106]) &&
+      toset([for membership in github_actions_organization_secret_repository.public_review_bot_access : membership.repository_id]) == toset([101, 102, 103, 104, 105, 106, 107]) &&
       !contains(keys(github_actions_organization_secret_repository.public_review_bot_access), ".github") &&
       !contains(keys(github_actions_organization_secret_repository.public_review_bot_access), "ha-echo-dot")
     )
-    error_message = "Only the six declared repositories may be managed in the existing BOT_PAT allowlist; existing profile and first-wave memberships must remain outside this resource."
+    error_message = "Only the seven declared repositories may be managed in the existing BOT_PAT allowlist; existing profile and first-wave memberships must remain outside this resource."
   }
 }
 

@@ -1,10 +1,11 @@
-# Manage six explicit memberships in the existing selected-repository secret.
+# Manage seven explicit memberships in the existing selected-repository secret.
 # Home Studio already has access and must be adopted rather than recreated.
 # Do not own its value, visibility, or the memberships of other repositories.
 locals {
   public_review_bot_access_repositories = toset([
     "assist-scenario-lab",
     "ha-entity-migrations",
+    "ha-jbd-bms-card",
     "ha-meter-contracts",
     "ha-scenario-tests",
     "home-studio",
@@ -23,7 +24,7 @@ resource "github_actions_organization_secret_repository" "public_review_bot_acce
         data.github_repository.public_release_review_targets[each.key].visibility == "public" &&
         !data.github_repository.public_release_review_targets[each.key].archived
       )
-      error_message = "Review credential access is limited to the six declared active public repositories."
+      error_message = "Review credential access is limited to the seven declared active public repositories."
     }
   }
 }

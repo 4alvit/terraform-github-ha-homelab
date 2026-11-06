@@ -44,7 +44,7 @@ resource "github_repository_vulnerability_alerts" "asterisk_telephony" {
 
 resource "github_repository_dependabot_security_updates" "asterisk_telephony" {
   repository = github_repository.asterisk_telephony.id
-  enabled    = true
+  enabled    = false
   depends_on = [github_repository_vulnerability_alerts.asterisk_telephony]
 }
 
