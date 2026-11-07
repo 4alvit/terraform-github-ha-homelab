@@ -46,5 +46,5 @@ resource "github_repository_ruleset" "jbd_bms_card" {
 resource "github_workflow_repository_permissions" "jbd_bms_card" {
   repository                       = github_repository.repositories["ha-jbd-bms-card"].name
   default_workflow_permissions     = "read"
-  can_approve_pull_request_reviews = false
+  can_approve_pull_request_reviews = true
 }

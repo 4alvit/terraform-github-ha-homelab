@@ -51,7 +51,7 @@ resource "github_repository_dependabot_security_updates" "asterisk_telephony" {
 resource "github_workflow_repository_permissions" "asterisk_telephony" {
   repository                       = github_repository.asterisk_telephony.name
   default_workflow_permissions     = "read"
-  can_approve_pull_request_reviews = false
+  can_approve_pull_request_reviews = true
 }
 
 resource "github_repository_ruleset" "asterisk_telephony" {
