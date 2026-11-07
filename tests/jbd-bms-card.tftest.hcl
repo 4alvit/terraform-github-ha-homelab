@@ -8,7 +8,7 @@ mock_provider "github" {
   }
 }
 
-run "battery_card_bootstraps_public_protection_without_additional_access" {
+run "battery_card_preserves_protection_and_independent_bot_review" {
   command = plan
 
   assert {
@@ -17,9 +17,9 @@ run "battery_card_bootstraps_public_protection_without_additional_access" {
       one(one(github_repository.repositories["ha-jbd-bms-card"].security_and_analysis).secret_scanning).status == "enabled" &&
       one(one(github_repository.repositories["ha-jbd-bms-card"].security_and_analysis).secret_scanning_push_protection).status == "enabled" &&
       github_workflow_repository_permissions.jbd_bms_card.default_workflow_permissions == "read" &&
-      !github_workflow_repository_permissions.jbd_bms_card.can_approve_pull_request_reviews
+      github_workflow_repository_permissions.jbd_bms_card.can_approve_pull_request_reviews
     )
-    error_message = "The new public card must enable secret protection at creation without granting write/approval permissions to workflow tokens."
+    error_message = "The public card must retain secret protection and read-only default workflow permissions while allowing independent Actions reviews for bot-authored dependency updates."
   }
 
   assert {
