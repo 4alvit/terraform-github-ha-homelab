@@ -46,9 +46,9 @@ run "asterisk_reviewer_can_approve_but_cannot_bypass" {
       github_repository_collaborator.public_release_reviewers["asterisk-telephony"].username == "californiantiramisu" &&
       github_repository_collaborator.public_release_reviewers["asterisk-telephony"].permission == "push" &&
       github_workflow_repository_permissions.asterisk_telephony.default_workflow_permissions == "read" &&
-      !github_workflow_repository_permissions.asterisk_telephony.can_approve_pull_request_reviews
+      github_workflow_repository_permissions.asterisk_telephony.can_approve_pull_request_reviews
     )
-    error_message = "Only organization owners may bypass. The existing bot gets scoped Write while workflow tokens remain read-only."
+    error_message = "Only organization owners may bypass. The existing bot gets scoped Write and independent Actions reviews are allowed while default workflow permissions remain read-only."
   }
 }
 
