@@ -35,7 +35,7 @@ jobs:
       (github.event_name != 'pull_request' && github.event_name != 'pull_request_review') ||
       (github.event.pull_request.head.repo.full_name == github.repository &&
        contains(fromJSON('["4alvit","californiantiramisu","renovate[bot]"]'), github.event.pull_request.user.login))
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/auto-merge.yml@77b0157695fb80e4d97c3ac4819c2d1db7ba96c7 # main
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/auto-merge.yml@0047a13b5eb79dfa770e31070a83e9696ddd36d1 # main
     with:
       pr-author: 4alvit,californiantiramisu,renovate[bot]
       merge-method: squash
